@@ -712,15 +712,27 @@
 				"z": 12
 			},
 			"options": {
-				"Room1": 25,
-				"Room3": 1,
-				"Room4": 1,
-				"Room2": 1
+				"Room1": 20,
+				"Room3": 0.5,
+				"Room4": 0.5,
+				"Room2": 0.5
 			},
 			"relative_x": 32,
 			"relative_y": 0,
 			"relative_z": 0
 		},
+
+		"53": {
+			"1": {
+				"prefab": "wall_remover",
+				"x": -20,
+				"z": 12
+			},
+			"relative_x": 18,
+			"relative_y": 0,
+			"relative_z": 0
+		},
+
 		"reversible": true,
 		"group": "clockwork_dungeon",
 		"spawn_in_water": true,
@@ -7730,9 +7742,40 @@
 				"prefab": "anvil",
 				"z": -553.5
 			},
-			"relative_x": 0,
+			"relative_x": 4,
 			"relative_y": 0,
-			"relative_z": 0
+			"relative_z": 4
+		},
+		"127": {
+			"1": {
+				"x": 6.5,
+				"prefab": "anvil",
+				"z": -553.5
+			},
+			"relative_x": -4,
+			"relative_y": 0,
+			"relative_z": -4
+		},
+		"128": {
+			"1": {
+				"x": 6.5,
+				"prefab": "anvil",
+				"z": -553.5
+			},
+			"relative_x": 4,
+			"relative_y": 0,
+			"relative_z": -4
+		},
+
+		"129": {
+			"1": {
+				"x": 6.5,
+				"prefab": "anvil",
+				"z": -553.5
+			},
+			"relative_x": -4,
+			"relative_y": 0,
+			"relative_z": 4
 		},
 		"worldborder_buffer": 0,
 		"no_rotation": false,

@@ -21,9 +21,9 @@ if not folder_name:find("workshop-") then
             ["uncompromising-survival"] = false,
             --workshop = "workshop-2039181790"
         },
-        { --pregame lobby
-            workshop = "workshop-2960467149"
-        },
+        --{ --pregame lobby
+        --    workshop = "workshop-2960467149"
+        --},
         { --party hud
             workshop = "workshop-2868599299"
         },
@@ -42,6 +42,10 @@ if not folder_name:find("workshop-") then
         { --modifiers
             workshop = "workshop-2503437364"
         },
+        { --stacksize
+            workshop = "workshop-1571581787"
+        },
+
     }
 else
     mod_dependencies = {
@@ -83,10 +87,14 @@ else
         { --modifiers
             workshop = "workshop-2503437364"
         },
+        { --stacksize
+            workshop = "workshop-1571581787"
+        },
+
     }
 end
 
-version = "6"
+version = "9"
 
 description = [[A total conversion mod that turns DST into a roguelike!]]
 
@@ -108,7 +116,7 @@ icon = "modicon.tex"
 
 server_filter_tags = {}
 
-priority = -50
+priority = -100
 
 ------------------------------
 -- local functions to makes things prettier
