@@ -45,6 +45,10 @@ local recipes = {
     ["wovengarland"] = { cost = 30, quantity = 1, character = nil },
     ["flowerheadband"] = { cost = 30, quantity = 1, character = nil },
 
+    ["recycled_7"] = { cost = 120, quantity = 1, character = nil },
+    ["recycled_8"] = { cost = 240, quantity = 1, character = nil },
+    ["recycled_9"] = { cost = 480, quantity = 1, character = nil },
+
     ["wereitem_beaver"] = { cost = 15, quantity = 1, character = "werehuman" },
     ["wereitem_goose"] = { cost = 15, quantity = 1, character = "werehuman" },
     ["wereitem_moose"] = { cost = 15, quantity = 1, character = "werehuman" },
@@ -93,10 +97,6 @@ local recipes = {
     ["dumbbell_redgem"] = { cost = 60, quantity = 1, character = "strongman" },
     ["wolfgang_whistle"] = { cost = 15, quantity = 1, character = "strongman" },
 
-    ["recycled_7"] = { cost = 120, quantity = 1, character = nil },
-    ["recycled_8"] = { cost = 240, quantity = 1, character = nil },
-    ["recycled_9"] = { cost = 480, quantity = 1, character = nil },
-
     ["compostwrap"] = { cost = 30, quantity = 1, character = "plantkin" },
 }
 
@@ -124,9 +124,8 @@ local slingshotammo = {}
 local TechTree = GLOBAL.require("techtree")
 
 AddPrefabPostInit("world", function(inst)
+
     GLOBAL.TUNING.STACK_SIZE_TINYITEM = GLOBAL.TUNING.STACK_SIZE_SMALLITEM
-
-
 
     inst:DoTaskInTime(0.0000001, function()
         for k, v in pairs(GLOBAL.AllRecipes) do
@@ -137,7 +136,7 @@ AddPrefabPostInit("world", function(inst)
                 table.insert(slingshotammo, v.name)
             end
         end
-        
+
         for item, data in pairs(recipes) do
             AddRecipeToFilter(item .. "2", "DUBLOONSHOP")
         end
@@ -176,9 +175,9 @@ AddPrefabPostInit("world", function(inst)
     end)
 
     if not GLOBAL.TheWorld.ismastersim then return end
+    GLOBAL.SpawnPrefab("multiplayer_portal")
 
     GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
-
         if not GLOBAL.TheWorld.ismastersim then return end
 
         GLOBAL.EmptyTheWorld()
@@ -218,13 +217,14 @@ AddPlayerPostInit(function(inst)
     end)
 end)
 
-AddPrefabPostInit("wall_moonrock", function(inst)
+AddPrefabPostInit("wall_stone", function(inst)
+    inst.AnimState:SetMultColour(0.5, 0.25, 0, 1)
     inst:RemoveComponent("workable")
     inst:AddTag("NOTARGET")
     inst:AddTag("notarget")
     if not GLOBAL.TheWorld.ismastersim then return end
 
-    inst.components.health.absorb = 0.95
+    inst.components.health.absorb = 1
 end)
 
 AddPrefabPostInitAny(function(inst)
@@ -232,7 +232,7 @@ AddPrefabPostInitAny(function(inst)
     if inst.components.combat ~= nil then
         local _keeptargetfn = inst.components.combat.keeptargetfn
         inst.components.combat.keeptargetfn = function(inst, target)
-            return _keeptargetfn ~= nil and _keeptargetfn(inst, target) and not target:HasTag("dungeon_mob") or _keeptargetfn == nil and not target:HasTag("dungeon_mob")
+            return _keeptargetfn ~= nil and _keeptargetfn(inst, target) and inst:HasTag("dungeon_mob") and not target:HasTag("dungeon_mob")  or _keeptargetfn == nil and inst:HasTag("dungeon_mob") and not target:HasTag("dungeon_mob")
         end
     end
 end)
@@ -293,7 +293,6 @@ table.insert(STARTING_ITEMS.WANDA, "forgedarts")
 table.insert(STARTING_ITEMS.WANDA, "reedtunic")
 
 STARTING_ITEMS.WATHOM = { "forginghammer", "forge_woodarmor" }
-STARTING_ITEMS.WINKY = { "forgedarts", "featheredtunic" }
 
 table.insert(STARTING_ITEMS.WIXIE, "forgedarts")
 table.insert(STARTING_ITEMS.WIXIE, "featheredtunic")
@@ -307,9 +306,10 @@ AddPrefabPostInit("dubloon", function(inst)
     local ATTACHDIST = 2
 
     inst:DoPeriodicTask(30, function(inst)
-        local num = #GLOBAL.AllPlayers >= 2 and math.random(#GLOBAL.AllPlayers)
-        inst.target = #GLOBAL.AllPlayers >= 2 and GLOBAL.AllPlayers[num].components.inventory ~= nil and GLOBAL.AllPlayers[num].components.inventory:CanAcceptCount(inst) > 0 and GLOBAL.AllPlayers[num] or inst:GetNearestPlayer(true)
-    end, .5)
+        local x,y,z = inst.Transform:GetWorldPosition()
+        local players = TheSim:FindEntities(x,y,z, 80, {"player"})
+        inst.target = players[#players >= 2 and math.random(#players) or 1]
+    end, math.random())
 
     local function OnUpdate(inst, dt)
         if inst.target and inst.target:IsValid() and inst.target.components.inventory ~= nil and inst.components.inventoryitem:GetGrandOwner() == nil and inst.target.components.inventory:CanAcceptCount(inst) > 0 then
@@ -348,17 +348,78 @@ local fastcharge = {
     ["moltendarts"] = -10,
     ["spiralspear"] = -0.5,
     ["blacksmith_edge"] = -10,
+    ["hearthsfire_crystals"] = -10,
 }
 
-for k, v in pairs(fastcharge) do
-    print("HERE", k, v)
-    AddPrefabPostInit(k, function(inst)
+for prefab, mult in pairs(fastcharge) do
+    AddPrefabPostInit(prefab, function(inst)
         if not GLOBAL.TheWorld.ismastersim then return end
 
-        inst.components.rechargeable:SetChargeTimeMod(inst, "fastcharge", v)
+        inst.components.rechargeable:SetChargeTimeMod(inst, "fastcharge", mult)
     end)
 end
 
 local fastproj = {
-    "moltendarts_projectile_explosive"
+    ["moltendarts_projectile_explosive"] = 1.5,
+    ["forgedarts_projectile_alt"] = 1.5,
+    ["moltendarts_projectile"] = 1.5,
 }
+
+for prefab, mult in pairs(fastproj) do
+    AddPrefabPostInit(prefab, function(inst)
+        if not GLOBAL.TheWorld.ismastersim then return end
+
+        if inst.components.projectile ~= nil then
+            inst.components.projectile:SetSpeed(inst.components.projectile.speed * mult)
+        elseif inst.components.aimedprojectile ~= nil then
+            inst.components.aimedprojectile:SetSpeed(inst.components.aimedprojectile.speed * mult)
+        end
+    end)
+end
+
+local function FixPlanarDamage(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    if inst.components ~= nil and inst.components.planardamage ~= nil then
+        if inst.components.weapon ~= nil then
+            inst.components.weapon:SetDamage(inst.components.weapon.damage + (inst.components.planardamage.basedamage * 1.5))
+        elseif inst.components.combat ~= nil then
+            inst.components.combat:SetDefaultDamage(inst.components.combat.defaultdamage + (inst.components.planardamage.basedamage * 1.5))
+        end
+    end
+end
+
+AddPrefabPostInitAny(FixPlanarDamage)
+
+AddPrefabPostInit("winky", function(inst)
+    inst.starting_inventory = { "livingstaff", "featheredtunic" }
+end)
+
+AddPrefabPostInit("bomb_lunarplant", function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst.components.complexprojectile.onhitfn = function(inst, attacker, target)
+        local x, y, z = inst.Transform:GetWorldPosition()
+
+        if inst.components.planardamage == nil then
+            inst:AddComponent("planardamage")
+            inst.components.planardamage:SetBaseDamage(TUNING.BOMB_LUNARPLANT_PLANAR_DAMAGE)
+        end
+
+        inst.SoundEmitter:KillSound("toss")
+
+        inst:AddComponent("explosive")
+        inst.components.explosive.explosiverange = TUNING.BOMB_LUNARPLANT_RANGE
+        inst.components.explosive.explosivedamage = TUNING.BOMB_LUNARPLANT_PLANAR_DAMAGE * 1.5
+        inst.components.explosive.lightonexplode = false
+        if inst.ispvp then
+            inst.components.explosive:SetPvpAttacker(attacker)
+        else
+            inst.components.explosive:SetAttacker(attacker)
+        end
+        inst.components.explosive:OnBurnt()
+        --exploding should have removed me
+
+        GLOBAL.SpawnPrefab("bomb_lunarplant_explode_fx").Transform:SetPosition(x, y, z)
+    end
+end)

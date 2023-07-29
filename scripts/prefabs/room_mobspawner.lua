@@ -1,3 +1,10 @@
+local prefabs = {
+    "lavaarena_portal_activefx",
+    "lavaarena_portal_player_fx",
+}
+
+TheSim:LoadPrefabs(prefabs)
+
 local presets =
 {
     {
@@ -28,7 +35,6 @@ local presets =
         sporehound      = .5,
         lightninghound  = .5,
         warg            = .25,
-        clayhound       = 1,
         mutatedhound    = 1,
         hedgehound      = 3,
         warglet         = .5,
@@ -41,7 +47,8 @@ local presets =
         koalefant_summer = 0.125,
         beefalo = 0.25,
         lightninggoat = 1,
-        alpha_lightninggoat = 0.5,
+        alpha_lightninggoat = 0.25,
+        tallbird = 0.5,
     },
     {
         worm = 1,
@@ -64,7 +71,6 @@ local presets =
         leif = 0.25,
         mandrake_active = 0.1,
         grassgator = 0.5,
-        fruitdragon = 1,
         lunarthrall_plant = 0.5,
         lordfruitfly = 0.5,
     },
@@ -81,88 +87,118 @@ local boss =
     bearger = 1,
     mock_dragonfly = 1,
     daywalker = 1,
-    alterguadian_phase1 = 0.25,
+    alterguardian_phase1 = 0.25,
     moonmaw_dragonfly = 0.25,
     hoodedwidow = 1,
 }
 
+--This is a mess and I hate it.
 local function SpawnDungeonMob(inst, prefab)
-    local mob = SpawnPrefab(prefab)
     local x, y, z = inst.Transform:GetWorldPosition()
+    local x, z = x + math.random(-8, 8), z + math.random(-8, 8)
 
-    assert(mob, "Attempted to spawn invalid dungeon mob prefab \"" .. prefab .. "\"!")
+    TheWorld:DoTaskInTime(math.random(), function()
+        local fx = SpawnPrefab("lavaarena_portal_activefx")
 
-    mob.Transform:SetPosition(x + math.random(-8, 8), y, z + math.random(-8, 8))
-    if mob.components.combat ~= nil then
-        mob:AddTag("dungeon_mob")
-        mob:AddTag("hostile")
-        mob:DoTaskInTime(0, function(inst)
-            inst.components.combat:SuggestTarget(inst:GetNearestPlayer())
-        end)
+        fx.Transform:SetPosition(x, y + 0.1, z)
 
-        mob.components.health:SetMaxHealth(mob.components.health.currenthealth * math.max((TheWorld.escalation_mult / 25), 1))
-        mob.components.combat.externaldamagemultipliers:SetModifier(mob, math.max((TheWorld.escalation_mult / 25), 1), "dungeon_scaling")
+        fx:DoTaskInTime(1, function(inst)
+            local fx2 = SpawnPrefab("lavaarena_portal_player_fx")
+            fx2.Transform:SetPosition(inst.Transform:GetWorldPosition())
 
-        mob:ListenForEvent("death", function(inst)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            inst:DoTaskInTime(0, function(inst)
-                local ents = TheSim:FindEntities(x, y, z, 64, { "dungeon_mob" })
-                local num = 0
-                local regen = true
-                for k, v in ipairs(ents) do
-                    if v.components.health ~= nil and not v.components.health:IsDead() or v.sg ~= nil and v.sg:HasStateTag("dead") then
-                        num = num + 1
-                    end
-                end
-                local spawner_count = 0
-                local spawned = false
-                if num == 0 then
-                    c_remote("c_save()")
-                    for k, v in pairs(Ents) do
-                        if v.prefab == "dl_spawner" and spawner_count <= 5 or v.prefab == "dl_spawner" and TheSim:FindFirstEntityWithTag("room_mobspawner") == nil then
-                            spawned = true
+            local mob = SpawnPrefab(prefab)
 
-                            v:DoTaskInTime(spawner_count, function()
-                                v:PushEvent("spawn_dl_clockwork_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/clockwork_dungeon.json" })
-                            end)
+            mob:Hide()
 
-                            spawner_count = spawner_count + 0.5
-                        end
-                        if TheSim:FindFirstEntityWithTag("room_mobspawner") then
-                            regen = false --don't regen if there's spawners left
-                        end
-                    end
+            if mob.DynamicShadow ~= nil then
+                mob.DynamicShadow:Enable(false)
+            end
 
-                    for k, v in pairs(AllPlayers) do
-                        for i = 0, TheWorld.escalation_mult * 0.66 do
-                            v.components.inventory:GiveItem(SpawnPrefab("dubloon"), nil, v:GetPosition())
-                        end
-                    end
+            mob:DoTaskInTime(0.3, function(inst)
+                inst:Show()
 
-
-                    if regen ~= false then
-                        TheNet:Announce("The dungeon shifts!")
-
-                        EmptyTheWorld()
-                        TheWorld:PushEvent("revertterraform", "clockwork_dungeon")
-                        TheWorld.escalation_mult = TheWorld.escalation_mult * 2
-                        for k, v in pairs(AllPlayers) do
-                            v.Transform:SetPosition(0, 0, 0)
-                            v.components.health:SetInvincible(true)
-                        end
-                    else
-                        if math.random() > 0.25 then
-                            TheWorld.escalation_mult = TheWorld.escalation_mult + ((math.random() / 2) * (#AllPlayers / 2))
-                            TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.escalation_mult, 0.05)))
-                        end
-                        if spawned then
-                            TheNet:Announce("The dungeon grows...")
-                        end
-                    end
+                if inst.DynamicShadow ~= nil then
+                    inst.DynamicShadow:Enable(true)
                 end
             end)
+            mob.Transform:SetPosition(x, y, z)
+
+            if mob.components.combat ~= nil then
+                mob:AddTag("dungeon_mob")
+                mob:AddTag("hostile")
+                mob:DoTaskInTime(0, function(inst)
+                    inst.components.combat:SuggestTarget(inst:GetNearestPlayer())
+                end)
+
+                mob.components.health:SetMaxHealth(mob.components.health.currenthealth * math.max((TheWorld.escalation_mult / 25), 1))
+                mob.components.combat.externaldamagemultipliers:SetModifier(mob, math.max((TheWorld.escalation_mult / 25), 1), "dungeon_scaling")
+
+                mob:ListenForEvent("death", function(inst)
+                    local x, y, z = inst.Transform:GetWorldPosition()
+                    inst:DoTaskInTime(0, function(inst)
+                        local ents = TheSim:FindEntities(x, y, z, 64, { "dungeon_mob" })
+                        local num = 0
+                        local regen = true
+                        for k, v in ipairs(ents) do
+                            if v.components.health ~= nil and not v.components.health:IsDead() or v.sg ~= nil and v.sg:HasStateTag("dead") then
+                                num = num + 1
+                            end
+                        end
+                        local spawner_count = 0
+                        local spawned = false
+                        if num == 0 then
+                            c_remote("c_save()")
+                            for k, v in pairs(Ents) do
+                                if spawner_count >= 5 then
+                                    break
+                                end
+
+                                if v.prefab == "dl_spawner" and FindEntity(inst, 480, nil, { "room_mobspawner" }) then
+                                    spawned = true
+                                    regen = false
+                                    spawner_count = spawner_count + 0.5
+
+                                    v:DoTaskInTime(spawner_count, function()
+                                        v:PushEvent("spawn_dl_clockwork_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/clockwork_dungeon.json" })
+                                    end)
+
+                                end
+                            end
+
+                            for k, v in pairs(AllPlayers) do
+                                for i = 0, TheWorld.escalation_mult * 0.66 do
+                                    v.components.inventory:GiveItem(SpawnPrefab("dubloon"), nil, v:GetPosition())
+                                end
+                            end
+
+                            if regen ~= false then
+                                TheNet:Announce("The dungeon shifts!")
+
+                                EmptyTheWorld()
+                                TheWorld:PushEvent("revertterraform", "clockwork_dungeon")
+                                TheWorld.escalation_mult = TheWorld.escalation_mult * 2
+                                for k, v in pairs(AllPlayers) do
+                                    v.Transform:SetPosition(0, 0, 0)
+                                    v.components.health:SetInvincible(true)
+                                end
+                            else
+                                if math.random() > 0.25 then
+                                    TheWorld.escalation_mult = TheWorld.escalation_mult + ((math.random() / 2) * (#AllPlayers / 2))
+                                    TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.escalation_mult, 0.05)))
+                                end
+                                if spawned then
+                                    TheNet:Announce("The dungeon grows...")
+                                end
+                            end
+                        end
+                    end)
+                end)
+            end
+
+            fx.AnimState:PlayAnimation("portal_pst")
+            fx:ListenForEvent("animover", fx.Remove)
         end)
-    end
+    end)
 end
 
 local function fn()
@@ -235,7 +271,7 @@ local function fn_remover()
         return inst
     end
 
-    inst:DoPeriodicTask(30, function(inst)
+    inst:DoPeriodicTask(5, function(inst)
         local x, y, z = inst.Transform:GetWorldPosition()
         local walls = TheSim:FindEntities(x, y, z, 5, { "wall" })
         for k, v in pairs(walls) do
@@ -247,4 +283,4 @@ local function fn_remover()
 end
 
 
-return Prefab("room_mobspawner", fn), Prefab("wall_remover", fn_remover)
+return Prefab("room_mobspawner", fn, nil, prefabs), Prefab("wall_remover", fn_remover)

@@ -94,7 +94,7 @@ else
     }
 end
 
-version = "9"
+version = "11"
 
 description = [[A total conversion mod that turns DST into a roguelike!]]
 
