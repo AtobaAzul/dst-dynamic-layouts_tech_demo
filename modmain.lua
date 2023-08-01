@@ -6,12 +6,46 @@ PrefabFiles = {
     "room_mobspawner"
 }
 
+Assets = {
+    Asset("ANIM", "anim/chandelier_wxdungeon.zip")
+}
+
+AddComponentPostInit("archivemanager", function(self)
+    function self:GetPowerSetting()
+        return true
+    end
+end)
+
+AddPrefabPostInit("archive_chandelier", function(inst)
+    inst.AnimState:SetBuild("chandelier_wxdungeon")
+    inst:PushEvent("arhivepoweron")
+    inst.widthscale = 1.5
+    inst:DoTaskInTime(1, function(inst)
+        if inst.updatelight then
+            inst.updatelight(inst)
+        end
+    end)
+
+    if not GLOBAL.TheWorld.ismastersim then
+        return
+    end
+
+    inst.components.playerprox:SetDist(35, 44) --15,17
+end)
+
+AddPrefabPostInit("chandelier_fire", function(inst)
+    inst.AnimState:SetMultColour(1, 0.5, 0, 1)
+end)
 --[[
 TODO
 
 
 ]]
 
+GLOBAL.TUNING.NONLETHAL_TEMPERATURE = true
+GLOBAL.TUNING.NONLETHAL_HUNGER = true
+GLOBAL.TUNING.NONLETHAL_DARKNESS = true
+GLOBAL.TUNING.NONLETHAL_PERCENT = 0.5
 
 local recipes = {
     ["forginghammer"] = { cost = 30, quantity = 1, character = nil },
@@ -109,22 +143,11 @@ for item, data in pairs(recipes) do
     AddRecipeToFilter(item .. "2", "DUBLOONSHOP")
 end
 
-local NOREMOVETAGS = { "player", "CLASSIFIED", "FX", "INLIMBO", "playerghost", "abigail" }
-
-function GLOBAL.EmptyTheWorld()
-    for k, v in pairs(GLOBAL.Ents) do
-        if not v:HasOneOfTags(NOREMOVETAGS) and not v.isplayer and v.entity:GetParent() == nil and v.widget == nil and v.Network ~= nil then
-            v:Remove()
-        end
-    end
-end
-
 local slingshotammo = {}
 
 local TechTree = GLOBAL.require("techtree")
 
 AddPrefabPostInit("world", function(inst)
-
     GLOBAL.TUNING.STACK_SIZE_TINYITEM = GLOBAL.TUNING.STACK_SIZE_SMALLITEM
 
     inst:DoTaskInTime(0.0000001, function()
@@ -175,66 +198,68 @@ AddPrefabPostInit("world", function(inst)
     end)
 
     if not GLOBAL.TheWorld.ismastersim then return end
-    GLOBAL.SpawnPrefab("multiplayer_portal")
 
     GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
         if not GLOBAL.TheWorld.ismastersim then return end
 
-        GLOBAL.EmptyTheWorld()
-        GLOBAL.SpawnPrefab("multiplayer_portal")
-        GLOBAL.TheWorld:PushEvent("revertterraform", "clockwork_dungeon")
-        local tx, ty = GLOBAL.TheWorld.Map:GetTileCoordsAtPoint(0, 0, 0)
-        GLOBAL.TheWorld.Map:SetTile(tx, ty, 4)
-        for k, v in pairs(GLOBAL.AllPlayers) do
-            v.Transform:SetPosition(0, 0, 0)
-            v.components.health:SetInvincible(true)
-        end
-
-        GLOBAL.TheWorld:ListenForEvent("finishedterraform", function(inst)
+        if GLOBAL.TheWorld.dl_setpieces["forge_dungeon"] == nil then
             local start = GLOBAL.SpawnPrefab("dl_spawner")
             start.Transform:SetPosition(0, 0, 0)
             start.components.writeable.text = "Start"
-            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/clockwork_dungeon.json" })
-
-            for k, v in pairs(GLOBAL.AllPlayers) do
-                v.Transform:SetPosition(0, 0, 0)
-                v.components.health:SetInvincible(false)
-            end
-        end)
-
-        if GLOBAL.TheWorld.dl_setpieces["clockwork_dungeon"] == nil then
-            local start = GLOBAL.SpawnPrefab("dl_spawner")
-            start.Transform:SetPosition(0, 0, 0)
-            start.components.writeable.text = "Start"
-            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/clockwork_dungeon.json" })
+            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/forge_dungeon.json" })
         end
     end)
 end)
 
+
+local DUNGEON_CC =
+{
+    day = "images/colour_cubes/summer_dusk_cc.tex",
+    dusk = "images/colour_cubes/summer_dusk_cc.tex",
+    night = "images/colour_cubes/summer_dusk_cc.tex",
+    full_moon = "images/colour_cubes/summer_dusk_cc.tex",
+}
+
 AddPlayerPostInit(function(inst)
+    inst.components.playervision:SetCustomCCTable(DUNGEON_CC)
+
     inst:DoTaskInTime(0, function(inst)
         inst.Transform:SetPosition(0, 0, 0)
     end)
+
+
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst:ListenForEvent("death", function(inst)
+        print("on dead!")
+        local all_dead = true
+
+        for k, v in pairs(GLOBAL.AllPlayers) do
+            if v.components.health ~= nil and not v.components.health:IsDead() then
+                print("not dead!")
+                all_dead = false
+            end
+        end
+
+        if all_dead then
+            inst:DoTaskInTime(5, function()
+                GLOBAL.c_regenerateshard()
+            end)
+        end
+    end)
+
+
+    inst.components.grue:AddImmunity("nogrue")
 end)
 
 AddPrefabPostInit("wall_stone", function(inst)
-    inst.AnimState:SetMultColour(0.5, 0.25, 0, 1)
+    inst.AnimState:SetMultColour(0.75, 0.45, 0, 1)
     inst:RemoveComponent("workable")
     inst:AddTag("NOTARGET")
     inst:AddTag("notarget")
     if not GLOBAL.TheWorld.ismastersim then return end
 
     inst.components.health.absorb = 1
-end)
-
-AddPrefabPostInitAny(function(inst)
-    if not GLOBAL.TheWorld.ismastersim then return end
-    if inst.components.combat ~= nil then
-        local _keeptargetfn = inst.components.combat.keeptargetfn
-        inst.components.combat.keeptargetfn = function(inst, target)
-            return _keeptargetfn ~= nil and _keeptargetfn(inst, target) and inst:HasTag("dungeon_mob") and not target:HasTag("dungeon_mob")  or _keeptargetfn == nil and inst:HasTag("dungeon_mob") and not target:HasTag("dungeon_mob")
-        end
-    end
 end)
 
 local STARTING_ITEMS = GLOBAL.TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT
@@ -306,8 +331,8 @@ AddPrefabPostInit("dubloon", function(inst)
     local ATTACHDIST = 2
 
     inst:DoPeriodicTask(30, function(inst)
-        local x,y,z = inst.Transform:GetWorldPosition()
-        local players = TheSim:FindEntities(x,y,z, 80, {"player"})
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local players = TheSim:FindEntities(x, y, z, 80, { "player" })
         inst.target = players[#players >= 2 and math.random(#players) or 1]
     end, math.random())
 
@@ -345,7 +370,7 @@ local fastcharge = {
     ["forginghammer"] = -10,
     ["forgedarts"] = -0.75,
     ["pithpike"] = -20,
-    ["moltendarts"] = -10,
+    ["moltendarts"] = -0.75,
     ["spiralspear"] = -0.5,
     ["blacksmith_edge"] = -10,
     ["hearthsfire_crystals"] = -10,
@@ -360,9 +385,9 @@ for prefab, mult in pairs(fastcharge) do
 end
 
 local fastproj = {
-    ["moltendarts_projectile_explosive"] = 1.5,
+    ["moltendarts_projectile_explosive"] = 0.75,
     ["forgedarts_projectile_alt"] = 1.5,
-    ["moltendarts_projectile"] = 1.5,
+    ["moltendarts_projectile"] = 1.25,
 }
 
 for prefab, mult in pairs(fastproj) do
@@ -378,7 +403,7 @@ for prefab, mult in pairs(fastproj) do
 end
 
 local function FixPlanarDamage(inst)
-    if not GLOBAL.TheWorld.ismastersim then return end
+    if not GLOBAL.TheWorld.ismastersim or not GLOBAL.TheWorld then return end
 
     if inst.components ~= nil and inst.components.planardamage ~= nil then
         if inst.components.weapon ~= nil then
@@ -423,3 +448,93 @@ AddPrefabPostInit("bomb_lunarplant", function(inst)
         GLOBAL.SpawnPrefab("bomb_lunarplant_explode_fx").Transform:SetPosition(x, y, z)
     end
 end)
+
+
+AddPrefabPostInit("moltendarts_projectile", function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+    local _OnUpdate = inst.components.projectile.OnUpdate
+
+    inst.components.projectile.OnUpdate = function(self, dt)
+        if self.inst.prefab == "moltendarts_projectile" and self.inst.from_explosion then
+            local target = GLOBAL.FindEntity(self.inst, 2, nil, { "_combat", "_health" }, { "INLIMBO", "invisible", "playerghost", "player", "companion", "abigail" })
+            if target ~= nil and target:IsValid() and target.components.combat ~= nil and target.components.health ~= nil and not target.components.health:IsDead() then
+                local weapon = self.owner.components.inventory:GetEquippedItem(GLOBAL.EQUIPSLOTS.HANDS)
+                self.owner.components.combat:DoAttack(target, weapon, self.inst)
+                self.inst:Remove()
+            end
+        end
+        return _OnUpdate(self, dt)
+    end
+
+    inst.components.projectile.homing = false
+
+    inst:DoTaskInTime(math.random(), function(inst)
+        inst.components.projectile.speed = inst.components.projectile.speed * 0.5
+    end)
+end)
+
+
+AddPrefabPostInit("moltendarts_projectile_explosive", function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    local __onhit = inst.components.aimedprojectile.onhit
+    inst.components.aimedprojectile:SetHitDistance(12)
+
+    inst.components.aimedprojectile.onhit = function(inst, owner, attacker, _target)
+        for i = 1, math.random(8, 10) do
+            local secondary_proj = GLOBAL.SpawnPrefab("moltendarts_projectile")
+            secondary_proj.Transform:SetPosition(inst.Transform:GetWorldPosition())
+
+            local theta = (secondary_proj:GetAngleToPoint(attacker:GetPosition().x, 0.5, attacker:GetPosition().z) + math.random(-45, 45)) * GLOBAL.DEGREES
+
+            secondary_proj.components.projectile:Throw(secondary_proj, inst, attacker)
+            local tpos = attacker:GetPosition()
+            tpos.x = tpos.x + -90 * math.cos(theta)
+            tpos.z = tpos.z - -90 * math.sin(theta)
+            secondary_proj.from_explosion = true
+            secondary_proj.components.projectile.owner = attacker
+            secondary_proj.components.projectile.dest = tpos
+            secondary_proj.components.projectile:RotateToTarget(tpos)
+            secondary_proj.components.projectile.speed = secondary_proj.components.projectile.speed * GLOBAL.GetRandomWithVariance(1, 0.5)
+        end
+
+        __onhit(inst, owner, attacker, _target)
+    end
+end)
+
+AddPrefabPostInit("blacksmith_edge", function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst.components.parryweapon.max_angle = 180
+    inst.components.parryweapon.duration = 60
+end)
+
+AddComponentPostInit("parryweapon", function(self)
+    function self:TryParry(inst, e, f, g, h)
+        if inst.sg then inst.sg:PushEvent("try_parry") end
+        if self.ontryparry then return self.ontryparry(inst, e, f, g, h) end
+        local attacker = e or g
+        local angleaway = inst.Transform:GetRotation() - inst:GetAngleToPoint(attacker.Transform:GetWorldPosition())
+        local angle = math.abs(angleaway + (angleaway > 180 and -360 or angleaway < -180 and 360 or 0))
+        return angle <= self.max_angle
+    end
+end)
+
+local refuel =
+{
+    ["waxwelljournal"] = 1,
+    ["pocketwatch_weapon"] = 1,
+}
+
+for k, v in pairs(refuel) do
+    AddPrefabPostInit(k, function(inst)
+        if not GLOBAL.TheWorld.ismastersim then return end
+
+        inst:DoPeriodicTask(v, function(inst)
+            inst.components.fueled:DoDelta(TUNING.LARGE_FUEL * 0.025)
+        end)
+    end)
+end
+
+GLOBAL.TUNING.SHADOWWAXWELL_SANITY_PENALTY.SHADOWWORKER = 0
+GLOBAL.TUNING.SHADOWWAXWELL_SANITY_PENALTY.SHADOWPROTECTOR = 0

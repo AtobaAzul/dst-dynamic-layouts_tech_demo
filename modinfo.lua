@@ -1,4 +1,4 @@
-name = "WX-78's Moon Base of Doom"
+name = "The Forge's Catacombs"
 -- borrowed from IA
 folder_name = folder_name or "workshop-"
 if not folder_name:find("workshop-") then
@@ -35,9 +35,6 @@ if not folder_name:find("workshop-") then
         },
         { --wx mod
             workshop = "workshop-2995850584"
-        },
-        { --help me up
-            workshop = "workshop-1595934840"
         },
         { --modifiers
             workshop = "workshop-2503437364"
@@ -81,9 +78,6 @@ else
         { --wx mod
             workshop = "workshop-2995850584"
         },
-        { --help me up
-            workshop = "workshop-1595934840"
-        },
         { --modifiers
             workshop = "workshop-2503437364"
         },
@@ -94,7 +88,7 @@ else
     }
 end
 
-version = "11"
+version = "16"
 
 description = [[A total conversion mod that turns DST into a roguelike!]]
 
@@ -116,7 +110,7 @@ icon = "modicon.tex"
 
 server_filter_tags = {}
 
-priority = -100
+priority = -1.79769313486231e+308
 
 ------------------------------
 -- local functions to makes things prettier
@@ -155,3 +149,42 @@ end
 
 configuration_options = {
 }
+
+game_modes = {
+    {
+        name = "lavaarena_dungeon",
+        label = "The Forge's Catacombs",
+        description = "* Fight through endless hordes in an ever-expanding dungeon.\n* Purchase items with dubloons.",
+        settings = {
+            internal = false,
+            level_type = "LAVAARENA_DUNGEON",
+            spawn_mode = "fixed",
+            resource_renewal = false,
+            ghost_sanity_drain = false,
+            ghost_enabled = false,
+            revivable_corpse = true,
+            portal_rez = false,
+            reset_time = nil,
+            invalid_recipes = nil,
+            --
+            drop_everything_on_despawn = false,
+            non_item_equips = false,
+            no_air_attack = true,
+            -- no_minimap = false,
+            no_hunger = true,
+            no_eating = false,
+            no_sanity = false,
+            no_temperature = true,
+            no_avatar_popup = false,
+
+            no_morgue_record = true,
+            hide_worldgen_loading_screen = true,
+            hide_received_gifts = false,
+            skin_tag = nil,
+            disable_transplanting = true,
+            disable_bird_mercy_items = true,
+        },
+    },
+}
+
+
