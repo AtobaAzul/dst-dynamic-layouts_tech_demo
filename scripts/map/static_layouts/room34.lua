@@ -65,50 +65,6 @@ return {
           visible = true,
           properties = {}
         },
-        {
-          name = "",
-          type = "maxwelllight_area",
-          shape = "rectangle",
-          x = 256,
-          y = 193,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "",
-          type = "maxwelllight_area",
-          shape = "rectangle",
-          x = 256,
-          y = 379,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "",
-          type = "maxwelllight_area",
-          shape = "rectangle",
-          x = 448,
-          y = 381,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "",
-          type = "maxwelllight_area",
-          shape = "rectangle",
-          x = 448,
-          y = 191,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {}
-        }
       }
     }
   }

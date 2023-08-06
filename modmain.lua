@@ -7,7 +7,9 @@ PrefabFiles = {
 }
 
 Assets = {
-    Asset("ANIM", "anim/chandelier_wxdungeon.zip")
+    Asset("ANIM", "anim/chandelier_wxdungeon.zip"),
+    Asset("ANIM", "anim/wall_dungeon.zip"),
+
 }
 
 AddComponentPostInit("archivemanager", function(self)
@@ -19,6 +21,7 @@ end)
 AddPrefabPostInit("archive_chandelier", function(inst)
     inst.AnimState:SetBuild("chandelier_wxdungeon")
     inst:PushEvent("arhivepoweron")
+    inst.Light:SetIntensity(.1)
     inst.widthscale = 1.5
     inst:DoTaskInTime(1, function(inst)
         if inst.updatelight then
@@ -48,99 +51,213 @@ GLOBAL.TUNING.NONLETHAL_DARKNESS = true
 GLOBAL.TUNING.NONLETHAL_PERCENT = 0.5
 
 local recipes = {
-    ["forginghammer"] = { cost = 30, quantity = 1, character = nil },
-    ["forgedarts"] = { cost = 30, quantity = 1, character = nil },
-    ["pithpike"] = { cost = 30, quantity = 1, character = nil },
-    ["livingstaff"] = { cost = 60, quantity = 1, character = nil },
-    ["moltendarts"] = { cost = 45, quantity = 1, character = nil },
-    ["infernalstaff"] = { cost = 60, quantity = 1, character = nil },
-    ["spiralspear"] = { cost = 45, quantity = 1, character = nil },
-    ["bacontome"] = { cost = 30, quantity = 1, character = nil },
-    ["hearthsfire_crystals"] = { cost = 30, quantity = 1, character = nil },
-    ["blacksmith_edge"] = { cost = 30, quantity = 1, character = nil },
-    ["featheredtunic"] = { cost = 15, quantity = 1, character = nil },
-    ["jaggedarmor"] = { cost = 15, quantity = 1, character = nil },
-    ["forge_woodarmor"] = { cost = 15, quantity = 1, character = nil },
-    ["silkenarmor"] = { cost = 15, quantity = 1, character = nil },
-    ["splintmail"] = { cost = 15, quantity = 1, character = nil },
-    ["steadfastarmor"] = { cost = 30, quantity = 1, character = nil },
-    ["barbedhelm"] = { cost = 15, quantity = 1, character = nil },
-    ["reedtunic"] = { cost = 15, quantity = 1, character = nil },
-    ["armor_hpdamager"] = { cost = 100, quantity = 1, character = nil },
-    ["armor_hpextraheavy"] = { cost = 120, quantity = 1, character = nil },
-    ["armor_hprecharger"] = { cost = 120, quantity = 1, character = nil },
-    ["armor_hppetmastery"] = { cost = 45, quantity = 1, character = nil },
-    ["featheredwreath"] = { cost = 30, quantity = 1, character = nil },
-    ["resplendentnoxhelm"] = { cost = 60, quantity = 1, character = nil },
-    ["blossomedwreath"] = { cost = 120, quantity = 1, character = nil },
-    ["clairvoyantcrown"] = { cost = 100, quantity = 1, character = nil },
-    ["noxhelm"] = { cost = 45, quantity = 1, character = nil },
-    ["crystaltiara"] = { cost = 15, quantity = 1, character = nil },
-    ["wovengarland"] = { cost = 30, quantity = 1, character = nil },
-    ["flowerheadband"] = { cost = 30, quantity = 1, character = nil },
+    ["forginghammer"]             = { cost = 30, quantity = 1, character = nil, move = true },
+    ["forgedarts"]                = { cost = 30, quantity = 1, character = nil, move = true },
+    ["pithpike"]                  = { cost = 30, quantity = 1, character = nil, move = true },
+    --["livingstaff"]               = { cost = 60, quantity = 1, character = nil, move = true },
+    ["moltendarts"]               = { cost = 45, quantity = 1, character = nil, move = true },
+    ["infernalstaff"]             = { cost = 60, quantity = 1, character = nil, move = true },
+    ["spiralspear"]               = { cost = 45, quantity = 1, character = nil, move = true },
+    ["bacontome"]                 = { cost = 30, quantity = 1, character = nil, move = true },
+    ["hearthsfire_crystals"]      = { cost = 30, quantity = 1, character = nil, move = true },
+    ["blacksmith_edge"]           = { cost = 30, quantity = 1, character = nil, move = true },
+    ["featheredtunic"]            = { cost = 15, quantity = 1, character = nil, move = true },
+    ["jaggedarmor"]               = { cost = 15, quantity = 1, character = nil, move = true },
+    ["forge_woodarmor"]           = { cost = 15, quantity = 1, character = nil, move = true },
+    ["silkenarmor"]               = { cost = 15, quantity = 1, character = nil, move = true },
+    ["splintmail"]                = { cost = 15, quantity = 1, character = nil, move = true },
+    ["steadfastarmor"]            = { cost = 30, quantity = 1, character = nil, move = true },
+    ["barbedhelm"]                = { cost = 15, quantity = 1, character = nil, move = true },
+    ["reedtunic"]                 = { cost = 15, quantity = 1, character = nil, move = true },
+    ["armor_hpdamager"]           = { cost = 100, quantity = 1, character = nil, move = true },
+    ["armor_hpextraheavy"]        = { cost = 120, quantity = 1, character = nil, move = true },
+    ["armor_hprecharger"]         = { cost = 120, quantity = 1, character = nil, move = true },
+    ["armor_hppetmastery"]        = { cost = 45, quantity = 1, character = nil, move = true },
+    ["featheredwreath"]           = { cost = 30, quantity = 1, character = nil, move = true },
+    ["resplendentnoxhelm"]        = { cost = 60, quantity = 1, character = nil, move = true },
+    ["blossomedwreath"]           = { cost = 120, quantity = 1, character = nil, move = true },
+    ["clairvoyantcrown"]          = { cost = 100, quantity = 1, character = nil, move = true },
+    ["noxhelm"]                   = { cost = 45, quantity = 1, character = nil, move = true },
+    ["crystaltiara"]              = { cost = 15, quantity = 1, character = nil, move = true },
+    ["wovengarland"]              = { cost = 30, quantity = 1, character = nil, move = true },
+    ["flowerheadband"]            = { cost = 30, quantity = 1, character = nil, move = true },
 
-    ["recycled_7"] = { cost = 120, quantity = 1, character = nil },
-    ["recycled_8"] = { cost = 240, quantity = 1, character = nil },
-    ["recycled_9"] = { cost = 480, quantity = 1, character = nil },
+    ["recycled_7"]                = { cost = 120, quantity = 1, character = nil },
+    ["recycled_8"]                = { cost = 240, quantity = 1, character = nil },
+    ["recycled_9"]                = { cost = 480, quantity = 1, character = nil },
 
-    ["wereitem_beaver"] = { cost = 15, quantity = 1, character = "werehuman" },
-    ["wereitem_goose"] = { cost = 15, quantity = 1, character = "werehuman" },
-    ["wereitem_moose"] = { cost = 15, quantity = 1, character = "werehuman" },
+    ["wereitem_beaver"]           = { cost = 15, quantity = 1, character = "werehuman" },
+    ["wereitem_goose"]            = { cost = 15, quantity = 1, character = "werehuman" },
+    ["wereitem_moose"]            = { cost = 15, quantity = 1, character = "werehuman" },
 
-    ["ghostlyelixir_slowregen"] = { cost = 30, quantity = 1, character = "elixirbrewer" },
-    ["ghostlyelixir_fastregen"] = { cost = 60, quantity = 1, character = "elixirbrewer" },
-    ["ghostlyelixir_shield"] = { cost = 15, quantity = 1, character = "elixirbrewer" },
+    ["ghostlyelixir_slowregen"]   = { cost = 30, quantity = 1, character = "elixirbrewer" },
+    ["ghostlyelixir_fastregen"]   = { cost = 60, quantity = 1, character = "elixirbrewer" },
+    ["ghostlyelixir_shield"]      = { cost = 15, quantity = 1, character = "elixirbrewer" },
     ["ghostlyelixir_retaliation"] = { cost = 15, quantity = 1, character = "elixirbrewer" },
-    ["ghostlyelixir_attack"] = { cost = 15, quantity = 1, character = "elixirbrewer" },
-    ["ghostlyelixir_speed"] = { cost = 15, quantity = 1, character = "elixirbrewer" },
+    ["ghostlyelixir_attack"]      = { cost = 15, quantity = 1, character = "elixirbrewer" },
+    ["ghostlyelixir_speed"]       = { cost = 15, quantity = 1, character = "elixirbrewer" },
 
-    ["battlesong_healthgain"] = { cost = 30, quantity = 1, character = "battlesinger" },
-    ["battlesong_durability"] = { cost = 30, quantity = 1, character = "battlesinger" },
-    ["battlesong_sanitygain"] = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_healthgain"]     = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_durability"]     = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_sanitygain"]     = { cost = 30, quantity = 1, character = "battlesinger" },
     ["battlesong_fireresistance"] = { cost = 30, quantity = 1, character = "battlesinger" },
-    ["battlesong_instant_taunt"] = { cost = 30, quantity = 1, character = "battlesinger" },
-    ["battlesong_instant_panic"] = { cost = 30, quantity = 1, character = "battlesinger" },
-    ["battlesong_sanityaura"] = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_instant_taunt"]  = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_instant_panic"]  = { cost = 30, quantity = 1, character = "battlesinger" },
+    ["battlesong_sanityaura"]     = { cost = 30, quantity = 1, character = "battlesinger" },
 
-    ["wx78module_maxhealth"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_maxhealth2"] = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_maxsanity"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_maxsanity1"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_maxhunger"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_maxhunger1"] = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_bee"] = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_taser"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_cold"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_heat"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_music"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_movespeed"] = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
-    ["wx78module_movespeed2"] = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxhealth"]      = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxhealth2"]     = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxsanity"]      = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxsanity1"]     = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxhunger"]      = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_maxhunger1"]     = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_bee"]            = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_taser"]          = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_cold"]           = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_heat"]           = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_music"]          = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_movespeed"]      = { cost = 30, quantity = 1, character = "upgrademoduleowner" },
+    ["wx78module_movespeed2"]     = { cost = 60, quantity = 1, character = "upgrademoduleowner" },
 
-    ["book_tentacles"] = { cost = 30, quantity = 1, character = "bookbuilder" },
-    ["book_brimstone"] = { cost = 30, quantity = 1, character = "bookbuilder" },
-    ["book_sleep"] = { cost = 30, quantity = 1, character = "bookbuilder" },
-    ["book_fire"] = { cost = 30, quantity = 1, character = "bookbuilder" },
-    ["book_web"] = { cost = 30, quantity = 1, character = "bookbuilder" },
+    ["book_tentacles"]            = { cost = 30, quantity = 1, character = "bookbuilder" },
+    ["book_brimstone"]            = { cost = 30, quantity = 1, character = "bookbuilder" },
+    ["book_sleep"]                = { cost = 30, quantity = 1, character = "bookbuilder" },
+    ["book_fire"]                 = { cost = 30, quantity = 1, character = "bookbuilder" },
+    ["book_web"]                  = { cost = 30, quantity = 1, character = "bookbuilder" },
 
-    ["dumbbell"] = { cost = 15, quantity = 1, character = "strongman" },
-    ["dumbbell_bluegem"] = { cost = 45, quantity = 1, character = "strongman" },
-    ["dumbbell_gem"] = { cost = 60, quantity = 1, character = "strongman" },
-    ["dumbbell_golden"] = { cost = 30, quantity = 1, character = "strongman" },
-    ["dumbbell_heat"] = { cost = 30, quantity = 1, character = "strongman" },
-    ["dumbbell_marble"] = { cost = 45, quantity = 1, character = "strongman" },
-    ["dumbbell_redgem"] = { cost = 60, quantity = 1, character = "strongman" },
-    ["wolfgang_whistle"] = { cost = 15, quantity = 1, character = "strongman" },
+    ["dumbbell"]                  = { cost = 15, quantity = 1, character = "strongman" },
+    ["dumbbell_bluegem"]          = { cost = 45, quantity = 1, character = "strongman" },
+    ["dumbbell_gem"]              = { cost = 60, quantity = 1, character = "strongman" },
+    ["dumbbell_golden"]           = { cost = 30, quantity = 1, character = "strongman" },
+    ["dumbbell_heat"]             = { cost = 30, quantity = 1, character = "strongman" },
+    ["dumbbell_marble"]           = { cost = 45, quantity = 1, character = "strongman" },
+    ["dumbbell_redgem"]           = { cost = 60, quantity = 1, character = "strongman" },
+    ["wolfgang_whistle"]          = { cost = 15, quantity = 1, character = "strongman" },
 
-    ["compostwrap"] = { cost = 30, quantity = 1, character = "plantkin" },
+    ["compostwrap"]               = { cost = 30, quantity = 1, character = "plantkin" },
 }
 
 local function AddShop(prefab, cost, qty, character)
     AddRecipe2(prefab .. "2", { GLOBAL.Ingredient("dubloon", math.ceil(cost ~= nil and cost or 1)) }, GLOBAL.TECH.MAGIC_THREE, { nil, nil, nounlock = true, numtogive = qty ~= nil and qty or 1, nil, nil, nil, nil, product = prefab, builder_tag = character, nil, sg_state = "give" }, { "DUBLOONSHOP" })
 end
 
+local TechTree = GLOBAL.require("techtree")
+
 for item, data in pairs(recipes) do
-    AddShop(item, data.cost, data.quantity, data.character)
-    AddRecipeToFilter(item .. "2", "DUBLOONSHOP")
+    if not data.move then
+        AddShop(item, data.cost, data.quantity, data.character)
+        AddRecipeToFilter(item .. "2", "DUBLOONSHOP")
+    else --assuming items without data is the forge items.
+        AddRecipeToFilter(item, "DUBLOONSHOP")
+        GLOBAL.AllRecipes[item].ingredients = { GLOBAL.Ingredient("dubloon", data.cost) }
+        GLOBAL.AllRecipes[item].level = TechTree.Create(GLOBAL.TECH.MAGIC_THREE)
+        GLOBAL.AllRecipes[item].nounlock = true
+        GLOBAL.AllRecipes[item].sg_state = "give"
+    end
+end
+
+local removeshop = {
+    "balloonspeed",
+    "bandage",
+    "pumpkin_lantern",
+    "fireflies",
+    "dock_kit",
+    "yotc_seedpacket",
+    "yotc_seedpacket_rare",
+    "trinket_26",
+    "trinket_25",
+    "balloon",
+    "balloonhat",
+    "goldenaxe",
+    "goldenpickaxe",
+    "goldenshovel",
+    "goldenhoe",
+    "goldenpitchfork",
+    "oar",
+    "saddlehorn",
+    "waterballoon",
+    "miniflare",
+    "featherpencil",
+    "minifan",
+    "oar_driftwood",
+    "bugnet",
+    "fishingrod",
+    "birdtrap",
+    "grass_umbrella",
+    "balloonparty",
+    "balloonvest",
+    "townportaltalisman",
+    "healingsalve",
+    "tillweedsalve",
+    "reviver",
+    "moonrockcrater",
+    "moonrockidol",
+    "halloweenpotion_moon",
+    "boat_grass_item",
+    "wall_wood_item",
+    "fence_item",
+    "lighter",
+    "blueamulet",
+    "honeycomb",
+    "fossil_piece",
+    "flowerhat",
+    "kelphat",
+    "watermelonhat",
+    "wall_wood_item",
+    "fence_gate_item",
+    "beehat",
+    "wall_hay_item",
+    "minerhat",
+    "lantern",
+    "giftwrap",
+    "bedroll_furry",
+    "pig_coin",
+    "megaflare",
+    "livingtree_root",
+    "chum",
+    "wall_stone_item",
+    "dock_woodposts_item",
+    "oar_monkey",
+    "moonglassaxe",
+    "telestaff",
+    "purpleamulet",
+    "icehat",
+    "onemanband",
+    "boatpatch",
+    "saddle_basic",
+    "fertilizer",
+    "ipecacsyrup",
+    "mermhat",
+    "wall_moonrock_item",
+    "wall_ruins_item",
+    "featherfan",
+    "hawaiianshirt",
+    "red_mushroomhat",
+    "blue_mushroomhat",
+    "green_mushroom",
+    "jellybean",
+    "wall_dreadstone",
+    "cannonball_rock",
+    "cane",
+    "brush",
+    "spiderhat",
+    "portabletent_item",
+    "stash_map",
+    "leif_idol",
+    "tacklecontainer",
+    "saddle_war",
+    "saddle_race",
+    "greenstaff",
+    "yellowstaff",
+    "supertacklecontainer",
+    "opalstaff",
+    "skeletonhat",
+    "hivehat",
+    "krampus_sack",
+}
+
+for k, v in ipairs(removeshop) do
+    GLOBAL.AllRecipes[v .. 2] = nil
 end
 
 local slingshotammo = {}
@@ -199,14 +316,45 @@ AddPrefabPostInit("world", function(inst)
 
     if not GLOBAL.TheWorld.ismastersim then return end
 
+    local _OnSave = GLOBAL.TheWorld.OnSave
+    local _OnLoad = GLOBAL.TheWorld.OnLoad
+
+    GLOBAL.TheWorld.OnSave = function(inst, data)
+        if data ~= nil then
+            data.threat_level = inst.threat_level
+        end
+        if _OnSave ~= nil then
+            return _OnSave(inst, data)
+        end
+        return data
+    end
+
+    GLOBAL.TheWorld.OnLoad = function(inst, data)
+        if data ~= nil and data.threat_level ~= nil then
+            inst.threat_level = data.threat_level
+        end
+
+        if _OnLoad ~= nil then
+            return _OnLoad(inst, data)
+        end
+    end
+
+
+    GLOBAL.TheWorld:ListenForEvent("finishedterraform", function()
+        local start = GLOBAL.SpawnPrefab("dl_spawner")
+        start.Transform:SetPosition(0, 0, 0)
+        start.components.writeable.text = "Start"
+        start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
+    end)
+
     GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
         if not GLOBAL.TheWorld.ismastersim then return end
 
-        if GLOBAL.TheWorld.dl_setpieces["forge_dungeon"] == nil then
+        if GLOBAL.TheWorld.dl_setpieces["lavaarena_dungeon"] == nil then
             local start = GLOBAL.SpawnPrefab("dl_spawner")
             start.Transform:SetPosition(0, 0, 0)
             start.components.writeable.text = "Start"
-            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/forge_dungeon.json" })
+            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
         end
     end)
 end)
@@ -229,6 +377,9 @@ AddPlayerPostInit(function(inst)
 
 
     if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst.components.eater:SetAbsorptionModifiers(1, 1, 1)
+    inst.components.combat:SetAttackPeriod(0)
 
     inst:ListenForEvent("death", function(inst)
         print("on dead!")
@@ -253,7 +404,11 @@ AddPlayerPostInit(function(inst)
 end)
 
 AddPrefabPostInit("wall_stone", function(inst)
-    inst.AnimState:SetMultColour(0.75, 0.45, 0, 1)
+    inst.AnimState:SetBuild("wall_dungeon")
+    inst:DoPeriodicTask(1, function(inst)
+    inst.AnimState:PlayAnimation("fullA")
+    end)
+    --inst.AnimState:SetMultColour(0.75, 0.45, 0, 1)
     inst:RemoveComponent("workable")
     inst:AddTag("NOTARGET")
     inst:AddTag("notarget")
@@ -302,10 +457,10 @@ table.insert(STARTING_ITEMS.WINONA, "forge_woodarmor")
 table.insert(STARTING_ITEMS.WARLY, "forgedarts")
 table.insert(STARTING_ITEMS.WARLY, "forge_woodarmor")
 
-table.insert(STARTING_ITEMS.WORTOX, "livingstaff")
+table.insert(STARTING_ITEMS.WORTOX, "forgedarts")
 table.insert(STARTING_ITEMS.WORTOX, "reedtunic")
 
-table.insert(STARTING_ITEMS.WORMWOOD, "livingstaff")
+table.insert(STARTING_ITEMS.WORMWOOD, "forgedarts")
 table.insert(STARTING_ITEMS.WORMWOOD, "reedtunic")
 
 table.insert(STARTING_ITEMS.WURT, "forginghammer")
@@ -417,7 +572,7 @@ end
 AddPrefabPostInitAny(FixPlanarDamage)
 
 AddPrefabPostInit("winky", function(inst)
-    inst.starting_inventory = { "livingstaff", "featheredtunic" }
+    inst.starting_inventory = { "forgedarts", "featheredtunic" }
 end)
 
 AddPrefabPostInit("bomb_lunarplant", function(inst)
@@ -538,3 +693,132 @@ end
 
 GLOBAL.TUNING.SHADOWWAXWELL_SANITY_PENALTY.SHADOWWORKER = 0
 GLOBAL.TUNING.SHADOWWAXWELL_SANITY_PENALTY.SHADOWPROTECTOR = 0
+
+AddPrefabPostInit("abigail", function(inst)
+    inst:AddTag("companion")
+end)
+
+AddPrefabPostInit("maxwelllight_area", function(inst)
+    inst:Remove()
+end)
+
+AddPrefabPostInit("researchlab3", function(inst)
+    inst:AddTag("maprevealer")
+
+    inst.MiniMapEntity:SetCanUseCache(false)
+    inst.MiniMapEntity:SetDrawOverFogOfWar(true)
+
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst:AddComponent("maprevealer")
+end)
+
+local weaponsparks = {
+    "weaponsparks",
+    "weaponsparks_bounce",
+    "weaponsparks_piercing",
+    "weaponsparks_thrusting",
+    "weaponsparks_fx",
+    "spear_gungnir_lungefx",
+    "forge_fireball_hit_fx",
+}
+
+local function onupdate_intensity(inst, dt)
+    inst.Light:SetIntensity(inst.i)
+    inst.i = inst.i - dt * 2
+    if inst.i <= 0 then
+        if inst.killfx then
+            inst:Remove()
+        else
+            inst.task:Cancel()
+            inst.task = nil
+        end
+    end
+end
+
+local function onupdate_radius(inst, dt)
+    inst.Light:SetRadius(inst.r)
+    inst.r = inst.r - dt * 2
+    if inst.r <= 0 then
+        if inst.killfx then
+            inst:Remove()
+        else
+            inst.taskr:Cancel()
+            inst.taskr = nil
+        end
+    end
+end
+
+
+for k, v in ipairs(weaponsparks) do
+    AddPrefabPostInit(v, function(inst)
+        inst.entity:AddLight()
+        inst.Light:SetIntensity(.6)
+        inst.Light:SetRadius(2)
+        inst.Light:SetFalloff(2)
+        inst.Light:SetColour(1, 1, 0)
+
+        inst.hue = 0
+
+        local dti = 0.025
+        local dtr = 0.025
+        inst.i = .9
+        inst.r = 2
+
+        inst.sound = inst.SoundEmitter ~= nil
+        inst.task = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames()*GLOBAL.FRAMES)/12, onupdate_intensity, nil, dti)--takes 12 onupdates for the fx intensity to be 0, I think.
+        inst.taskr = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames()*GLOBAL.FRAMES)/40, onupdate_radius, nil, dtr)--takes 80 onupdates for the fx radius to be 0, I think.
+
+    end)
+end
+
+local flicker = {
+    "forgedarts_projectile_alt",
+    "forgedarts_projectile",
+    "moltendarts_projectile_explosive",
+    "moltendarts_projectile",
+    "forge_fireball_projectile",
+    "forge_fireball_projectile_fast"
+}
+
+
+
+for k, v in ipairs(flicker) do
+    AddPrefabPostInit(v, function(inst)
+        inst.entity:AddLight()
+        inst.Light:SetFalloff(3)
+        inst.Light:SetColour(1, 1, 0)
+
+        if not string.find(v, "moltendarts") then
+            inst.Light:SetIntensity(0)
+            inst.Light:SetRadius(0)
+            inst.base_intensity = .6
+            inst.base_rad = 1
+        else
+            inst.Light:SetIntensity(0)
+            inst.Light:SetRadius(0)
+            inst.base_intensity = .6
+            inst.base_rad = v == "moltendarts_projectile_explosive" and 3 or 1.25
+        end
+
+        inst.task = inst:DoPeriodicTask(GLOBAL.FRAMES, function(inst)
+            local curr_i, curr_r = inst.Light:GetIntensity(), inst.Light:GetRadius()
+            if curr_i < inst.base_intensity then
+                print(curr_i)
+                inst.Light:SetIntensity(curr_i+inst.base_intensity/5)
+            end
+            if curr_r < inst.base_rad then
+                print(curr_r)
+
+                inst.Light:SetRadius(curr_r+inst.base_rad/5)
+            end
+
+            if curr_r > inst.base_rad and curr_i > inst.base_intensity then
+                inst.task = inst:DoPeriodicTask(GLOBAL.FRAMES, function(inst)
+                    inst.Light:SetIntensity(GLOBAL.GetRandomWithVariance(inst.base_intensity, inst.base_intensity*0.9))
+                    inst.Light:SetRadius(GLOBAL.GetRandomWithVariance(inst.base_rad, inst.base_intensity*0.9))
+                end) 
+            end
+        end)
+    end)
+end

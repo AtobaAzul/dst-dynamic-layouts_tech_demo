@@ -123,22 +123,18 @@ local function OnDungeonMobDeath(inst)
         local spawner_count = 0
         local spawned = false
         if num == 0 then
-            c_remote("c_save()")
             for k, v in pairs(Ents) do
-                if spawner_count >= 5 then
-                    break
-                end
-
-                if v.prefab == "dl_spawner" then
-                    spawned = true
+                if v.prefab == "room_mobspawner" then
                     regen = false
+                elseif v.prefab == "dl_spawner" and spawner_count <= 5 then
                     spawner_count = spawner_count + 0.5
+                    spawned = true
 
-                    v:DoTaskInTime(spawner_count, function()
-                        v:PushEvent("spawn_dl_forge_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/forge_dungeon.json" })
-                    end)
+                    v:PushEvent("spawn_dl_lavaarena_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
                 end
             end
+
+            c_remote("c_save()")
 
             for k, v in pairs(AllPlayers) do
                 for i = 0, TheWorld.threat_level * 0.66 do
@@ -149,13 +145,22 @@ local function OnDungeonMobDeath(inst)
             if regen ~= false then
                 TheNet:Announce("The dungeon shifts!")
 
-                TheWorld:PushEvent("revertterraform", "forge_dungeon")
+                TheWorld:PushEvent("revertterraform", "lavaarena_dungeon")
                 TheWorld.threat_level = TheWorld.threat_level * 1.5
                 for k, v in pairs(AllPlayers) do
                     v.Transform:SetPosition(0, 0, 0)
-                    v.components.health:SetInvincible(true)
+                    if v:HasTag("corpse") then
+                        v.components.revivablecorpse:Revive(v)
+                    end
+                    v.components.health:DoDelta(v.components.health.maxhealth)
                 end
             else
+                for k, v in pairs(AllPlayers) do
+                    if v:HasTag("corpse") then
+                        v.components.revivablecorpse:Revive(v)
+                    end
+                    v.components.health:DoDelta(v.components.health.maxhealth / 8)
+                end
                 if math.random() > 0.25 then
                     TheWorld.threat_level = TheWorld.threat_level + ((math.random() / 2) * (#AllPlayers / 2))
                     TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.threat_level, 0.05)))
@@ -248,22 +253,13 @@ local function SpawnDungeonMob(inst, prefab)
 
 
             mob:DoTaskInTime(0.3, function(inst)
-                if mob.components.lootdropper ~= nil then
-                    mob.components.lootdropper.loot = {}
-                    mob.components.lootdropper.chanceloot = nil
-                    mob.components.lootdropper.randomloot = nil
-                    mob.components.lootdropper.numrandomloot = nil
-                    mob.components.lootdropper.lootsetupfn = nil
-                    mob.components.lootdropper.ifnotchanceloot = nil
-                end
-
-
                 inst:Show()
 
                 if inst.DynamicShadow ~= nil then
                     inst.DynamicShadow:Enable(true)
                 end
             end)
+
             mob.Transform:SetPosition(x, y, z)
 
             if mob.components.combat ~= nil then

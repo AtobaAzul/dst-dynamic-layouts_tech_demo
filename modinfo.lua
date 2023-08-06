@@ -88,7 +88,7 @@ else
     }
 end
 
-version = "16"
+version = "26"
 
 description = [[A total conversion mod that turns DST into a roguelike!]]
 
@@ -104,7 +104,7 @@ hamlet_compatible = false
 forge_compatible = false
 
 all_clients_require_mod = true
-
+ 
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
@@ -186,5 +186,3 @@ game_modes = {
         },
     },
 }
-
-
