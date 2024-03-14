@@ -5,6 +5,32 @@ local prefabs = {
 
 TheSim:LoadPrefabs(prefabs)
 
+--why here? good question!
+
+function c_expand_dungeon()
+    TheWorld:DoTaskInTime(0, function()
+        local spawner = TheSim:FindFirstEntityWithTag("dl_spawner")
+        if spawner then
+            spawner:PushEvent("spawn_dl_lavaarena_dungeon", { angle_override = spawner.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
+        end
+    end)
+end
+
+function c_regenerate_dungeon()
+    TheNet:Announce("The dungeon shifts!")
+
+    TheWorld:PushEvent("revertterraform", "lavaarena_dungeon")
+    TheWorld.threat_level = TheWorld.threat_level * 1.5
+    for k, v in pairs(AllPlayers) do
+        v.Transform:SetPosition(0, 0, 0)
+        if v:HasTag("corpse") then
+            v.components.revivablecorpse:Revive(v)
+        end
+        v.components.health:DoDelta(v.components.health.maxhealth)
+    end
+    
+end
+
 local threatlevel_preset =
 {
     {
@@ -48,6 +74,7 @@ local threatlevel_preset =
             warglet         = 3,
             claywarg        = 5,
             gingerbreadwarg = 5,
+            mutatedwarg = 7.5,
         },
         minimum = 0.25
     },
@@ -114,27 +141,24 @@ local function OnDungeonMobDeath(inst)
     inst:DoTaskInTime(0, function(inst)
         local ents = TheSim:FindEntities(x, y, z, 64, { "dungeon_mob" })
         local num = 0
-        local regen = true
+        local regen = false
+        local spawned = false
+
         for k, v in ipairs(ents) do
             if v.components.health ~= nil and not v.components.health:IsDead() or v.sg ~= nil and v.sg:HasStateTag("dead") then
                 num = num + 1
             end
         end
-        local spawner_count = 0
-        local spawned = false
+
+        if TheSim:FindFirstEntityWithTag("dl_spawner") ~= nil then
+            spawned = true
+        end
+
         if num == 0 then
-            for k, v in pairs(Ents) do
-                if v.prefab == "room_mobspawner" then
-                    regen = false
-                elseif v.prefab == "dl_spawner" and spawner_count <= 5 then
-                    spawner_count = spawner_count + 0.5
-                    spawned = true
-
-                    v:PushEvent("spawn_dl_lavaarena_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
-                end
+            local spawners = TheSim:FindEntities(x, y, z, 100, { "dl_spawner" })
+            for k, v in pairs(spawners) do
+                v:PushEvent("spawn_dl_lavaarena_dungeon", { angle_override = v.angle_away, file_path_override = TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
             end
-
-            c_remote("c_save()")
 
             for k, v in pairs(AllPlayers) do
                 for i = 0, TheWorld.threat_level * 0.66 do
@@ -162,13 +186,17 @@ local function OnDungeonMobDeath(inst)
                     v.components.health:DoDelta(v.components.health.maxhealth / 8)
                 end
                 if math.random() > 0.25 then
-                    TheWorld.threat_level = TheWorld.threat_level + ((math.random() / 2) * (#AllPlayers / 2))
+                    TheWorld.threat_level = (TheWorld.threat_level + ((math.random() / 2) * (#AllPlayers / 2))) * (1 + (TheWorld.state.cycles / 10))
                     TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.threat_level, 0.05)))
                 end
                 if spawned then
                     TheNet:Announce("The dungeon grows...")
                 end
             end
+            TheWorld:DoTaskInTime(0, function()
+                --deffer a frame. May bve causing reversibility issues.
+            c_remote("c_save()")
+            end)
         end
     end)
 end
@@ -180,11 +208,11 @@ function PickDungeonMob()
     end
 
     local current_tr = TheWorld.threat_level
-    print("current_tr", current_tr)
+   
     local preset = threatlevel_preset[math.random(#threatlevel_preset)]
-    printwrap("preset", preset)
+   
     if preset.minimum > current_tr then
-        print("minimum is too high!")
+       
         return PickDungeonMob()
     end
 
@@ -194,27 +222,27 @@ function PickDungeonMob()
     local available_mobs = {}
 
     for mob, score in pairs(preset.choices) do
-        print("mob, score", mob, score)
+       
         table.insert(available_mobs, { mob = mob, score = score })
     end
 
-    print(threat_level >= current_tr)
-    print(threat_level, current_tr)
+   
+   
 
     while current_tr >= threat_level do
-        print("while loop")
+       
         local choice = available_mobs[math.random(#available_mobs)]
-        printwrap("choice", choice)
+       
         table.insert(mobs_to_spawn, choice.mob)
         if choice.mob == "powder_monkey" and math.random() > 0.9 then
             table.insert(mobs_to_spawn, "boat_cannon")
         end
 
         threat_level = threat_level + choice.score
-        print("new tr", threat_level)
+       
     end
 
-    printwrap("final mobs to spawn", mobs_to_spawn)
+   
 
     return mobs_to_spawn
 end
@@ -228,6 +256,8 @@ local boss =
     alterguardian_phase1 = 0.25,
     moonmaw_dragonfly = 0.25,
     hoodedwidow = 1,
+    mutatedbearger = 1,
+    mutateddeerclops = 1,
 }
 
 --This is a mess and I hate it.

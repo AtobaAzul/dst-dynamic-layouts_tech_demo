@@ -341,16 +341,18 @@ AddPrefabPostInit("world", function(inst)
 
 
     GLOBAL.TheWorld:ListenForEvent("finishedterraform", function()
-        local start = GLOBAL.SpawnPrefab("dl_spawner")
-        start.Transform:SetPosition(0, 0, 0)
-        start.components.writeable.text = "Start"
-        start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
+        GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
+            local start = GLOBAL.SpawnPrefab("dl_spawner")
+            start.Transform:SetPosition(0, 0, 0)
+            start.components.writeable.text = "Start"
+            start.SpawnLayout(start, { file_path_override = GLOBAL.TUNING.DL_TD.MODROOT .. "scripts/lavaarena_dungeon.json" })
+        end)
     end)
 
     GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
         if not GLOBAL.TheWorld.ismastersim then return end
 
-        if GLOBAL.TheWorld.dl_setpieces["lavaarena_dungeon"] == nil then
+        if GLOBAL.TheWorld.components.dynamic_layouts.layouts["lavaarena_dungeon"] == nil then
             local start = GLOBAL.SpawnPrefab("dl_spawner")
             start.Transform:SetPosition(0, 0, 0)
             start.components.writeable.text = "Start"
@@ -382,12 +384,10 @@ AddPlayerPostInit(function(inst)
     inst.components.combat:SetAttackPeriod(0)
 
     inst:ListenForEvent("death", function(inst)
-        print("on dead!")
         local all_dead = true
 
         for k, v in pairs(GLOBAL.AllPlayers) do
             if v.components.health ~= nil and not v.components.health:IsDead() then
-                print("not dead!")
                 all_dead = false
             end
         end
@@ -403,15 +403,19 @@ AddPlayerPostInit(function(inst)
     inst.components.grue:AddImmunity("nogrue")
 end)
 
+GLOBAL.TUNING.PISLAND_SIZE = 30
+
 AddPrefabPostInit("wall_stone", function(inst)
     inst.AnimState:SetBuild("wall_dungeon")
     inst:DoPeriodicTask(1, function(inst)
-    inst.AnimState:PlayAnimation("fullA")
+        inst.AnimState:PlayAnimation("fullA")
     end)
     --inst.AnimState:SetMultColour(0.75, 0.45, 0, 1)
     inst:RemoveComponent("workable")
     inst:AddTag("NOTARGET")
     inst:AddTag("notarget")
+    inst:AddTag("NOCLICK")
+
     if not GLOBAL.TheWorld.ismastersim then return end
 
     inst.components.health.absorb = 1
@@ -558,13 +562,14 @@ for prefab, mult in pairs(fastproj) do
 end
 
 local function FixPlanarDamage(inst)
-    if not GLOBAL.TheWorld.ismastersim or not GLOBAL.TheWorld then return end
+    if not GLOBAL.TheWorld.ismastersim then return end
 
     if inst.components ~= nil and inst.components.planardamage ~= nil then
         if inst.components.weapon ~= nil then
-            inst.components.weapon:SetDamage(inst.components.weapon.damage + (inst.components.planardamage.basedamage * 1.5))
-        elseif inst.components.combat ~= nil then
-            inst.components.combat:SetDefaultDamage(inst.components.combat.defaultdamage + (inst.components.planardamage.basedamage * 1.5))
+            inst.components.weapon:SetDamage(inst.components.weapon.damage + (inst.components.planardamage:GetDamage() * 1.5))
+        end
+        if inst.components.combat ~= nil then
+            inst.components.combat:SetDefaultDamage(inst.components.combat.defaultdamage + (inst.components.planardamage:GetDamage() * 1.5))
         end
     end
 end
@@ -721,6 +726,7 @@ local weaponsparks = {
     "weaponsparks_fx",
     "spear_gungnir_lungefx",
     "forge_fireball_hit_fx",
+    "superjump_fx",
 }
 
 local function onupdate_intensity(inst, dt)
@@ -766,9 +772,8 @@ for k, v in ipairs(weaponsparks) do
         inst.r = 2
 
         inst.sound = inst.SoundEmitter ~= nil
-        inst.task = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames()*GLOBAL.FRAMES)/12, onupdate_intensity, nil, dti)--takes 12 onupdates for the fx intensity to be 0, I think.
-        inst.taskr = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames()*GLOBAL.FRAMES)/40, onupdate_radius, nil, dtr)--takes 80 onupdates for the fx radius to be 0, I think.
-
+        inst.task = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames() * GLOBAL.FRAMES) / 12, onupdate_intensity, nil, dti) --takes 12 onupdates for the fx intensity to be 0, I think.
+        inst.taskr = inst:DoPeriodicTask((inst.AnimState:GetCurrentAnimationNumFrames() * GLOBAL.FRAMES) / 40, onupdate_radius, nil, dtr)   --takes 80 onupdates for the fx radius to be 0, I think.
     end)
 end
 
@@ -804,21 +809,137 @@ for k, v in ipairs(flicker) do
         inst.task = inst:DoPeriodicTask(GLOBAL.FRAMES, function(inst)
             local curr_i, curr_r = inst.Light:GetIntensity(), inst.Light:GetRadius()
             if curr_i < inst.base_intensity then
-                print(curr_i)
-                inst.Light:SetIntensity(curr_i+inst.base_intensity/5)
+                inst.Light:SetIntensity(curr_i + inst.base_intensity / 5)
             end
             if curr_r < inst.base_rad then
-                print(curr_r)
-
-                inst.Light:SetRadius(curr_r+inst.base_rad/5)
+                inst.Light:SetRadius(curr_r + inst.base_rad / 5)
             end
 
             if curr_r > inst.base_rad and curr_i > inst.base_intensity then
                 inst.task = inst:DoPeriodicTask(GLOBAL.FRAMES, function(inst)
-                    inst.Light:SetIntensity(GLOBAL.GetRandomWithVariance(inst.base_intensity, inst.base_intensity*0.9))
-                    inst.Light:SetRadius(GLOBAL.GetRandomWithVariance(inst.base_rad, inst.base_intensity*0.9))
-                end) 
+                    inst.Light:SetIntensity(GLOBAL.GetRandomWithVariance(inst.base_intensity, inst.base_intensity * 0.9))
+                    inst.Light:SetRadius(GLOBAL.GetRandomWithVariance(inst.base_rad, inst.base_intensity * 0.9))
+                end)
             end
         end)
     end)
 end
+
+--modifer mod overwrites:
+
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_6"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_7"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_8"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_9"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_13"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_14"] = false
+GLOBAL.TUNING.MOD_MODIFIER["ATTRIBUTE_15"] = false
+
+--functioning helmsplitter and multithrust
+
+AddComponentPostInit("multithruster", function(self)
+    function self:DoThrust(owner, target) --target? idk the original code is minified
+        local mult = owner.components.combat.damagemultiplier ~= nil and owner.components.combat.damagemultiplier * 1.25 or 1.25
+        owner.components.combat:DoAttack(target, nil, nil, "strong", mult)
+    end
+end)
+
+AddComponentPostInit("helmsplitter", function(self)
+    function self:DoHelmSplit(owner, h)
+        if owner.sg then owner.sg:PushEvent("do_helmsplit") end
+        local i = owner.components.combat.damagemultiplier ~= nil and owner.components.combat.damagemultiplier * 5 or 5
+        owner.components.combat:DoSpecialAttack(self.damage, h, "strong", i)
+        if self.onhelmsplit then self.onhelmsplit(self.inst, owner, h) end
+    end
+end)
+
+AddPrefabPostInit("blacksmith_edge", function(inst)
+    inst:AddTag("helmsplitter")
+
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst.hits       = 0
+    local _onattack = inst.components.weapon.onattack
+
+    local function OnAttack(inst, attacker, target)
+        if _onattack ~= nil then
+            _onattack(inst, attacker, target)
+        end
+        inst.hits = inst.hits + 1
+
+
+        if inst.hits > 3 then
+            inst:AddTag("helmsplitter")
+            inst.hits = 0
+        else
+            inst:RemoveTag("helmsplitter") --just a failsafe.
+        end
+    end
+    inst.components.weapon:SetOnAttack(OnAttack)
+end)
+
+AddPrefabPostInit("spiralspear", function(inst)
+    inst:AddTag("multithruster")
+
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    inst.hits       = 0
+
+    local _onattack = inst.components.weapon.onattack
+
+    local function OnAttack(inst, attacker, target)
+        if _onattack ~= nil then
+            _onattack(inst, attacker, target)
+        end
+        inst.hits = inst.hits + 1
+
+
+        if inst.hits > 3 then
+            inst:AddTag("multithruster")
+            inst.hits = 0
+        else
+            inst:RemoveTag("multithruster") --just a failsafe
+        end
+    end
+    inst.components.weapon:SetOnAttack(OnAttack)
+end)
+
+
+GLOBAL.STRINGS.NAMES.WALL_STONE = "Dungeon Wall"
+
+AddComponentPostInit("temperature", function(self)
+    function self:OnUpdate(dt, applyhealthdelta)
+        self.current = GLOBAL.TUNING.STARTING_TEMP
+        --nothing!
+    end
+end)
+
+AddPrefabPostInitAny(function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    if inst.components.combat ~= nil and inst.components.combat.targetfn then
+        inst.components.combat.targetfn = function(inst)
+            return inst:GetNearestPlayer(true)
+        end
+
+        inst.components.combat.keeptargetfn = function(inst, target)
+            return target
+                and target.components.combat
+                and target.components.health
+                and not target.components.health:IsDead()
+        end
+    end
+end)
+
+
+AddPrefabPostInitAny(function(inst)
+    if not GLOBAL.TheWorld.ismastersim then return end
+
+    if inst.components.stackable ~= nil then
+        inst.components.stackable:SetIgnoreMaxSize(true)
+    end
+
+    if inst.components.container ~= nil then
+        inst.components.container:EnableInfiniteStackSize(true)
+    end
+end)

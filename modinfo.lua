@@ -30,19 +30,9 @@ if not folder_name:find("workshop-") then
         { --dmg display
             workshop = "workshop-2964299587"
         },
-        { --wigfrid rerefresh
-            workshop = "workshop-2892396162"
-        },
-        { --wx mod
-            workshop = "workshop-2995850584"
-        },
         { --modifiers
             workshop = "workshop-2503437364"
         },
-        { --stacksize
-            workshop = "workshop-1571581787"
-        },
-
     }
 else
     mod_dependencies = {
@@ -88,11 +78,10 @@ else
     }
 end
 
-version = "26"
+version = "28"
 
-description = [[A total conversion mod that turns DST into a roguelike!]]
-
-author = "󰀈 The Uncomp Dev Team 󰀈"
+description = "Version: " .. version .. "\nA total conversion mod that turns DST into a roguelike!"
+author = "Atobá Azul & Canis"
 
 api_version = 10
 
@@ -104,7 +93,7 @@ hamlet_compatible = false
 forge_compatible = false
 
 all_clients_require_mod = true
- 
+
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 

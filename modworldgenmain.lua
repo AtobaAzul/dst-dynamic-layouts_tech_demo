@@ -1,4 +1,4 @@
-GLOBAL.TUNING.PISLAND_SIZE = 150
+GLOBAL.TUNING.PISLAND_SIZE = 30
 
 AddTile(
     "DUNGEONSTONE",
@@ -66,3 +66,21 @@ AddTaskSetPreInitAny(function(tasksetdata)
     end
 end)
 
+
+local size = GLOBAL.TUNING.PISLAND_SIZE
+
+if GLOBAL.rawget(GLOBAL, "WorldSim") then
+	local idx = GLOBAL.getmetatable(GLOBAL.WorldSim).__index
+
+	local OldSetWorldSize = idx.SetWorldSize
+
+	idx.SetWorldSize = function(self, width, height)
+		print("[Prison Island Override] Setting world size to " .. (size or width))
+		OldSetWorldSize(self, size or width, size or height)
+	end
+
+	local OldConvertToTileMap = idx.ConvertToTileMap
+	idx.ConvertToTileMap = function(self, length)
+		OldConvertToTileMap(self, size or length)
+	end
+end

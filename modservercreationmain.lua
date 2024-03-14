@@ -180,10 +180,10 @@ AddLevel(GLOBAL.LEVELTYPE.LAVAARENA_DUNGEON, { --I don't even know anymore
 })
 
 if GLOBAL.TheFrontEnd then
-    print("first")
+   
 	local CurrentScreen = GLOBAL.TheFrontEnd:GetOpenScreenOfType("ServerCreationScreen")
 	if CurrentScreen and CurrentScreen.server_settings_tab and CurrentScreen.server_settings_tab.game_mode.spinner.enabled then
-        print("second")
+       
 		CurrentScreen.server_settings_tab.game_mode.spinner:SetOptions(GLOBAL.GetGameModesSpinnerData(GLOBAL.ModManager:GetEnabledServerModNames()))
 		CurrentScreen.server_settings_tab.game_mode.spinner:SetSelected("lavaarena_dungeon")
         CurrentScreen.server_settings_tab.game_mode.spinner:Changed()
