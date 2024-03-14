@@ -65,7 +65,7 @@ else
     }
 end
 
-version = "28"
+version = "1"
 
 description = "Version: " .. version .. "\nA total conversion mod that turns DST into a roguelike!"
 author = "Atobá Azul & Canis"
