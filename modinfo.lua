@@ -1,4 +1,4 @@
-name = "The Forge's Catacombs"
+name = "[ALPHA] The Forge's Catacombs"
 -- borrowed from IA
 folder_name = folder_name or "workshop-"
 if not folder_name:find("workshop-") then
@@ -10,16 +10,16 @@ if not folder_name:find("workshop-") then
         { --FORGE WEPS
             workshop = "workshop-1221281706",
         },
-        {
-            ["dst-dynamic-layouts"] = false,
+        --{ --uncomp adds dynamic layouts already!
+        --    ["dst-dynamic-layouts"] = false,
             --workshop = "workshop-3009621570"
-        },
+        --},
         { --casino mode
             workshop = "workshop-2656551380"
         },
         { --UM
             ["uncompromising-survival"] = false,
-            --workshop = "workshop-2039181790"
+           -- workshop = "workshop-2039181790"
         },
         --{ --pregame lobby
         --    workshop = "workshop-2960467149"
@@ -42,10 +42,6 @@ else
         { --FORGE WEPS
             workshop = "workshop-1221281706",
         },
-        {
-            --["dst-dynamic-layouts"] = false,
-            workshop = "workshop-3009621570"
-        },
         { --casino mode
             workshop = "workshop-2656551380"
         },
@@ -62,17 +58,8 @@ else
         { --dmg display
             workshop = "workshop-2964299587"
         },
-        { --wigfrid rerefresh
-            workshop = "workshop-2892396162"
-        },
-        { --wx mod
-            workshop = "workshop-2995850584"
-        },
         { --modifiers
             workshop = "workshop-2503437364"
-        },
-        { --stacksize
-            workshop = "workshop-1571581787"
         },
 
     }
