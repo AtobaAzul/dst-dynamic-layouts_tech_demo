@@ -109,7 +109,6 @@ local threatlevel_preset =
             fused_shadeling = 3,
             crawlingnightmare = 1,
             nightmarebeak = 3,
-            swilson = 3,
         },
         minimum = 1
     },
