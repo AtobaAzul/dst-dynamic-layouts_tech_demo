@@ -218,7 +218,7 @@ AddPrefabPostInit("world", function(inst)
     inst:DoTaskInTime(0.0000001, function()
         for k, v in pairs(GLOBAL.AllRecipes) do
             if string.find(v.name, "slingshotammo_") then
-                v.ingredients = { Ingredient("dubloon", 5) }
+                v.ingredients = { Ingredient("dubloon", 2) }
                 v.level = TechTree.Create(GLOBAL.TECH.NONE)
                 v.nounlock = true
                 table.insert(slingshotammo, v.name)

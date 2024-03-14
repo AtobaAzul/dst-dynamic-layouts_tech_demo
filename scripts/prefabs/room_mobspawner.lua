@@ -178,8 +178,8 @@ local function OnDungeonMobDeath(inst)
                     v.components.health:DoDelta(v.components.health.maxhealth / 8)
                 end
                 if math.random() > 0.25 then
-                    TheWorld.threat_level = (TheWorld.threat_level + ((math.random() / 2) * (#AllPlayers / 2))) * (1 + (TheWorld.state.cycles / 10))
-                    TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.threat_level, 0.05)))
+                    TheWorld.threat_level = (TheWorld.threat_level + ((math.random() / 2) * (math.pow(2, #AllPlayers)))) * (1 + (TheWorld.state.cycles / 5))
+                    TheNet:Announce("Threat level increased! " .. tostring(RoundToNearest(TheWorld.threat_level, 0.5)))
                 end
                 if spawned then
                     TheNet:Announce("The dungeon grows...")
@@ -237,8 +237,8 @@ local boss =
     alterguardian_phase1 = 0.25,
     moonmaw_dragonfly = 0.25,
     hoodedwidow = 1,
-    mutatedbearger = 1,
-    mutateddeerclops = 1,
+    mutatedbearger = 0.25,
+    mutateddeerclops = 0.25,
 }
 
 --This is a mess and I hate it.

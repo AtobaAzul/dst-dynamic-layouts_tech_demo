@@ -15,6 +15,7 @@ Assets = {
 
 modimport("init/init_postinit")
 modimport("init/init_shop")
+--modimport("init/init_shop2")
 
 GLOBAL.TUNING.NONLETHAL_TEMPERATURE = true
 GLOBAL.TUNING.NONLETHAL_HUNGER = true
@@ -140,10 +141,13 @@ AddPrefabPostInit("maxwelllight_area", function(inst)
 end)
 
 AddPrefabPostInit("researchlab3", function(inst)
-    inst:AddTag("maprevealer")
-
-    inst.MiniMapEntity:SetCanUseCache(false)
     inst.MiniMapEntity:SetDrawOverFogOfWar(true)
+    inst.MiniMapEntity:SetIsFogRevealer(true)
+    inst.MiniMapEntity:SetCanUseCache(false)
+    inst.MiniMapEntity:SetPriority(11)
+
+    inst:AddTag("maprevealer")
+    inst:AddTag("fogrevealer")
 
     if not GLOBAL.TheWorld.ismastersim then return end
 

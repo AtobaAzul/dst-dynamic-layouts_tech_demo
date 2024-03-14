@@ -2,7 +2,7 @@ AddPrefabPostInit("archive_chandelier", function(inst)
     inst.AnimState:SetBuild("chandelier_wxdungeon")
     inst:PushEvent("arhivepoweron")
     inst.Light:SetIntensity(.1)
-    inst.widthscale = 1.5
+    inst.widthscale = 2
     inst:DoTaskInTime(1, function(inst)
         if inst.updatelight then
             inst.updatelight(inst)
@@ -13,7 +13,7 @@ AddPrefabPostInit("archive_chandelier", function(inst)
         return
     end
 
-    inst.components.playerprox:SetDist(35, 44) --15,17
+    inst.components.playerprox:SetDist(44, 50) --15,17
 end)
 
 AddPrefabPostInit("chandelier_fire", function(inst)
