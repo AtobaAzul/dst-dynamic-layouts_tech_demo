@@ -28,7 +28,6 @@ function c_regenerate_dungeon()
         end
         v.components.health:DoDelta(v.components.health.maxhealth)
     end
-    
 end
 
 local threatlevel_preset =
@@ -74,7 +73,7 @@ local threatlevel_preset =
             warglet         = 3,
             claywarg        = 5,
             gingerbreadwarg = 5,
-            mutatedwarg = 7.5,
+            mutatedwarg     = 15,
         },
         minimum = 0.25
     },
@@ -126,13 +125,6 @@ local threatlevel_preset =
         },
         minimum = 1
     },
-    {
-        choices =
-        {
-            powder_monkey = 1,
-        },
-        minimum = 1
-    }
 }
 
 
@@ -195,7 +187,7 @@ local function OnDungeonMobDeath(inst)
             end
             TheWorld:DoTaskInTime(0, function()
                 --deffer a frame. May bve causing reversibility issues.
-            c_remote("c_save()")
+                c_remote("c_save()")
             end)
         end
     end)
@@ -208,11 +200,10 @@ function PickDungeonMob()
     end
 
     local current_tr = TheWorld.threat_level
-   
+
     local preset = threatlevel_preset[math.random(#threatlevel_preset)]
-   
+
     if preset.minimum > current_tr then
-       
         return PickDungeonMob()
     end
 
@@ -222,27 +213,17 @@ function PickDungeonMob()
     local available_mobs = {}
 
     for mob, score in pairs(preset.choices) do
-       
         table.insert(available_mobs, { mob = mob, score = score })
     end
 
-   
-   
 
     while current_tr >= threat_level do
-       
         local choice = available_mobs[math.random(#available_mobs)]
-       
+
         table.insert(mobs_to_spawn, choice.mob)
-        if choice.mob == "powder_monkey" and math.random() > 0.9 then
-            table.insert(mobs_to_spawn, "boat_cannon")
-        end
 
         threat_level = threat_level + choice.score
-       
     end
-
-   
 
     return mobs_to_spawn
 end
