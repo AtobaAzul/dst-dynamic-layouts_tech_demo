@@ -143,7 +143,7 @@ game_modes = {
     {
         name = "lavaarena_dungeon",
         label = "The Forge's Catacombs",
-        description = "* Fight through endless hordes in an ever-expanding dungeon.\n* Purchase items with dubloons.",
+        description = "* Fight through endless hordes in an ever-expanding and ever-harder dungeon.\n* Gain Dubloons and purchase items.",
         settings = {
             internal = false,
             level_type = "LAVAARENA_DUNGEON",
