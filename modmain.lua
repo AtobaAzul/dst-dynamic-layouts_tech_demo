@@ -178,24 +178,6 @@ end)
 AddPrefabPostInitAny(function(inst)
     if not GLOBAL.TheWorld.ismastersim then return end
 
-    if inst.components.combat ~= nil and inst.components.combat.targetfn then
-        inst.components.combat.targetfn = function(inst)
-            return inst:GetNearestPlayer(true)
-        end
-
-        inst.components.combat.keeptargetfn = function(inst, target)
-            return target
-                and target.components.combat
-                and target.components.health
-                and not target.components.health:IsDead()
-        end
-    end
-end)
-
-
-AddPrefabPostInitAny(function(inst)
-    if not GLOBAL.TheWorld.ismastersim then return end
-
     if inst.components.stackable ~= nil then
         inst.components.stackable:SetIgnoreMaxSize(true)
     end

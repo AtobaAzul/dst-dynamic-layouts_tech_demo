@@ -83,6 +83,10 @@ local recipes = {
     ["wolfgang_whistle"]          = { cost = 15, quantity = 1, character = "strongman" },
 
     ["compostwrap"]               = { cost = 30, quantity = 1, character = "plantkin" },
+
+    ["slignshot_gnasher"] = { cost = 60, quantity = 1, character = "pebblemaker" },
+    ["slignshot_matilda"] = { cost = 60, quantity = 1, character = "pebblemaker" },
+
 }
 
 local function AddShop(prefab, cost, qty, character)

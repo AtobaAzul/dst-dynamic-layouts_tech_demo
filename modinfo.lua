@@ -18,8 +18,8 @@ if not folder_name:find("workshop-") then
             workshop = "workshop-2656551380"
         },
         { --UM
-            ["uncompromising-survival"] = false,
-           -- workshop = "workshop-2039181790"
+            --["uncompromising-survival"] = false,
+           workshop = "workshop-2039181790"
         },
         --{ --pregame lobby
         --    workshop = "workshop-2960467149"
@@ -49,9 +49,9 @@ else
             --["uncompromising-survival"] = false,
             workshop = "workshop-2039181790"
         },
-        { --pregame lobby
-            workshop = "workshop-2960467149"
-        },
+        --{ --pregame lobby
+        --    workshop = "workshop-2960467149"
+       -- },
         { --party hud
             workshop = "workshop-2868599299"
         },
@@ -65,7 +65,7 @@ else
     }
 end
 
-version = "1"
+version = "1.0.0"
 
 description = "Version: " .. version .. "\nA total conversion mod that turns DST into a roguelike!"
 author = "Atobá Azul & Canis"
