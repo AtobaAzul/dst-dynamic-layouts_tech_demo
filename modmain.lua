@@ -1,14 +1,23 @@
+print("HELP")
 GLOBAL.TUNING.DL_TD = {
     MODROOT = MODROOT,
 }
 
 PrefabFiles = {
-    "room_mobspawner"
+    "room_mobspawner",
+    "dubloon"
 }
 
 Assets = {
     Asset("ANIM", "anim/chandelier_wxdungeon.zip"),
     Asset("ANIM", "anim/wall_dungeon.zip"),
+    Asset("ANIM", "anim/dubloon.zip"),
+    Asset("ATLAS", "images/slotm_inventory.xml"),
+    Asset("IMAGE", "images/slotm_inventory.tex"),
+	Asset("ATLAS", "images/Slotmachine.xml"),
+	Asset("IMAGE", "images/Slotmachine.tex"),
+	Asset("ATLAS", "images/dubloons.xml"),
+	Asset("IMAGE", "images/dubloons.tex"),
 
 }
 
@@ -21,7 +30,8 @@ GLOBAL.TUNING.NONLETHAL_TEMPERATURE = true
 GLOBAL.TUNING.NONLETHAL_HUNGER = true
 GLOBAL.TUNING.NONLETHAL_DARKNESS = true
 GLOBAL.TUNING.NONLETHAL_PERCENT = 0.5
-
+GLOBAL.STRINGS.NAMES.DUBLOON = "Dubloons"
+GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.DUBLOON = "Coins!"
 
 AddPrefabPostInit("world", function(inst)
     if not GLOBAL.TheWorld.ismastersim then return end
@@ -47,71 +57,7 @@ AddPrefabPostInit("world", function(inst)
     end)
 end)
 
-
-
 GLOBAL.TUNING.PISLAND_SIZE = 30
-
-
-local STARTING_ITEMS = GLOBAL.TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT
-
-table.insert(STARTING_ITEMS.WILSON, "forgedarts")
-table.insert(STARTING_ITEMS.WILSON, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WILLOW, "forgedarts")
-table.insert(STARTING_ITEMS.WILLOW, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WOLFGANG, "forginghammer")
-table.insert(STARTING_ITEMS.WOLFGANG, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WENDY, "forgedarts")
-table.insert(STARTING_ITEMS.WENDY, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WX78, "forginghammer")
-table.insert(STARTING_ITEMS.WX78, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WICKERBOTTOM, "bacontome")
-table.insert(STARTING_ITEMS.WICKERBOTTOM, "reedtunic")
-
-table.insert(STARTING_ITEMS.WOODIE, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WES, "forgedarts")
-table.insert(STARTING_ITEMS.WES, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WAXWELL, "bacontome")
-table.insert(STARTING_ITEMS.WAXWELL, "reedtunic")
-
-table.insert(STARTING_ITEMS.WATHGRITHR, "pithpike")
-table.insert(STARTING_ITEMS.WATHGRITHR, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WEBBER, "forgedarts")
-table.insert(STARTING_ITEMS.WEBBER, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WINONA, "forginghammer")
-table.insert(STARTING_ITEMS.WINONA, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WARLY, "forgedarts")
-table.insert(STARTING_ITEMS.WARLY, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WORTOX, "forgedarts")
-table.insert(STARTING_ITEMS.WORTOX, "reedtunic")
-
-table.insert(STARTING_ITEMS.WORMWOOD, "forgedarts")
-table.insert(STARTING_ITEMS.WORMWOOD, "reedtunic")
-
-table.insert(STARTING_ITEMS.WURT, "forginghammer")
-table.insert(STARTING_ITEMS.WURT, "forge_woodarmor")
-
-table.insert(STARTING_ITEMS.WALTER, "forgedarts")
-table.insert(STARTING_ITEMS.WALTER, "featheredtunic")
-
-table.insert(STARTING_ITEMS.WANDA, "forgedarts")
-table.insert(STARTING_ITEMS.WANDA, "reedtunic")
-
-STARTING_ITEMS.WATHOM = { "forginghammer", "forge_woodarmor" }
-
-table.insert(STARTING_ITEMS.WIXIE, "forgedarts")
-table.insert(STARTING_ITEMS.WIXIE, "featheredtunic")
-
 
 local refuel =
 {

@@ -7,43 +7,34 @@ if not folder_name:find("workshop-") then
         { --PRISON ISLAND
             workshop = "workshop-2982373019",
         },
-        { --FORGE WEPS
-            workshop = "workshop-1221281706",
-        },
         --{ --uncomp adds dynamic layouts already!
         --    ["dst-dynamic-layouts"] = false,
-            --workshop = "workshop-3009621570"
+        --workshop = "workshop-3009621570"
         --},
-        { --casino mode
-            workshop = "workshop-2656551380"
-        },
         { --UM
             --["uncompromising-survival"] = false,
-           workshop = "workshop-2039181790"
+            workshop = "workshop-2039181790"
         },
         --{ --pregame lobby
         --    workshop = "workshop-2960467149"
         --},
-        { --party hud
-            workshop = "workshop-2868599299"
-        },
-        { --dmg display
-            workshop = "workshop-2964299587"
-        },
+        --{ --party hud
+        --    workshop = "workshop-2868599299"
+        --},
+        --{ --dmg display
+        --    workshop = "workshop-2964299587"
+        --},
         { --modifiers
             workshop = "workshop-2503437364"
         },
+        --{ --wigfrid rerefresh
+        --    workshop = "workshop-2892396162"
+        --},
     }
 else
     mod_dependencies = {
         { --PRISON ISLAND
             workshop = "workshop-2982373019",
-        },
-        { --FORGE WEPS
-            workshop = "workshop-1221281706",
-        },
-        { --casino mode
-            workshop = "workshop-2656551380"
         },
         { --UM
             --["uncompromising-survival"] = false,
@@ -51,7 +42,7 @@ else
         },
         --{ --pregame lobby
         --    workshop = "workshop-2960467149"
-       -- },
+        -- },
         { --party hud
             workshop = "workshop-2868599299"
         },
@@ -61,7 +52,9 @@ else
         { --modifiers
             workshop = "workshop-2503437364"
         },
-
+        { --wigfrid rerefresh
+            workshop = "workshop-2892396162"
+        },
     }
 end
 

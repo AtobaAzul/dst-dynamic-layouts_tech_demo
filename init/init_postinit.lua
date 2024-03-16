@@ -6,8 +6,6 @@ local component_post = {
 local prefab_post = {
     "archive_chandelier",
     "cursed_monkey_token",
-    "dubloon",
-    "forge",
     "walls",
 }
 
