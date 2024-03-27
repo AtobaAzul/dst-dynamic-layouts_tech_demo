@@ -4251,7 +4251,7 @@
             },
             "options": {
                 "Connection": 3,
-                "End": 1
+                "end": 1
             },
             "relative_x": -24,
             "relative_y": 0,
@@ -4265,7 +4265,7 @@
             },
             "options": {
                 "Connection": 1.5,
-                "End": 2.5
+                "end": 2.5
             },
             "relative_x": 0,
             "relative_y": 0,
@@ -4279,7 +4279,7 @@
             },
             "options": {
                 "Connection": 1.5,
-                "End": 2.5
+                "end": 2.5
             },
             "relative_x": 0,
             "relative_y": 0,

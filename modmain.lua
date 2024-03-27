@@ -12,8 +12,8 @@ Assets = {
     Asset("ANIM", "anim/chandelier_wxdungeon.zip"),
     Asset("ANIM", "anim/wall_dungeon.zip"),
     Asset("ANIM", "anim/dubloon.zip"),
-    Asset("ATLAS", "images/slotm_inventory.xml"),
-    Asset("IMAGE", "images/slotm_inventory.tex"),
+   Asset("ATLAS", "images/slotm_inventory.xml"),
+   Asset("IMAGE", "images/slotm_inventory.tex"),
 	Asset("ATLAS", "images/Slotmachine.xml"),
 	Asset("IMAGE", "images/Slotmachine.tex"),
 	Asset("ATLAS", "images/dubloons.xml"),
@@ -34,8 +34,6 @@ GLOBAL.STRINGS.NAMES.DUBLOON = "Dubloons"
 GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.DUBLOON = "Coins!"
 
 AddPrefabPostInit("world", function(inst)
-    if not GLOBAL.TheWorld.ismastersim then return end
-
     GLOBAL.TheWorld:ListenForEvent("finishedterraform", function()
         GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
             local start = GLOBAL.SpawnPrefab("dl_spawner")
@@ -45,9 +43,9 @@ AddPrefabPostInit("world", function(inst)
         end)
     end)
 
-    GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
-        if not GLOBAL.TheWorld.ismastersim then return end
+    if not GLOBAL.TheWorld.ismastersim then return end
 
+    GLOBAL.TheWorld:DoTaskInTime(0, function(inst)
         if GLOBAL.TheWorld.components.dynamic_layouts.layouts["lavaarena_dungeon"] == nil then
             local start = GLOBAL.SpawnPrefab("dl_spawner")
             start.Transform:SetPosition(0, 0, 0)
@@ -61,8 +59,8 @@ GLOBAL.TUNING.PISLAND_SIZE = 30
 
 local refuel =
 {
-    ["waxwelljournal"] = 1,
-    ["pocketwatch_weapon"] = 1,
+    waxwelljournal = 1,
+    pocketwatch_weapon = 1,
 }
 
 for k, v in pairs(refuel) do
